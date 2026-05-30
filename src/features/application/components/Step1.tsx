@@ -60,7 +60,7 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
 
   useEffect(() => {
     dispatch(fetchCountriesAsync())
-  }, [dispatch])
+  }, [dispatch]) 
 
   const [countryQuery, setCountryQuery] = useState('')
   const [countryOpen, setCountryOpen] = useState(false)
