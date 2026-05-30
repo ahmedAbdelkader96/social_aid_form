@@ -478,6 +478,34 @@ select {
   color: #111827;
   font-size: 0.95rem;
   outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 2px;
+  opacity: 0.6;
+  filter: invert(0.8);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+input[type="date"][readonly] {
+  cursor: pointer;
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23374151' d='M5.5 7.5l4.5 4.5 4.5-4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 12px;
+  padding-right: 40px;
 }
 
 
@@ -648,11 +676,13 @@ select:focus,
     height: 56px;
     padding: 14px 16px;
     box-sizing: border-box;
+    cursor: pointer;
   }
 
   .fieldTextarea,
   .fieldTextarea {
     height: auto;
     min-height: 160px;
+    cursor: text;
   }
 }

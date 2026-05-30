@@ -223,7 +223,7 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
       </AnimatedFieldLabel>
       <AnimatedFieldLabel delayIndex={2}>
         {t('dob')}
-        <input type="date" {...register('dateOfBirth', { required: true })} className={styles.fieldInput} aria-invalid={!!errors.dateOfBirth} />
+        <input type="date" readOnly {...register('dateOfBirth', { required: true })} className={styles.fieldInput} aria-invalid={!!errors.dateOfBirth} />
         {errors.dateOfBirth && <span className={styles.errorText}>{t('required')}</span>}
       </AnimatedFieldLabel>
       <AnimatedFieldLabel delayIndex={3}>
