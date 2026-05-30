@@ -444,7 +444,35 @@
   color: #111827;
   font-size: 0.95rem;
   outline: none;
+  box-sizing: border-box;
 }
+
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.95rem;
+}
+
+select {
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.95rem;
+}
+
 
 .fieldTextarea {
   min-height: 160px;
@@ -589,5 +617,22 @@
 
   .languageToggle {
     width: 100%;
+  }
+
+  .fieldLabel {
+    min-height: auto;
+  }
+
+  .fieldInput,
+  .fieldTextarea,
+  .languageSelect,
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  select {
+    width: 100%;
+    min-height: 56px;
+    padding: 14px 16px;
+    box-sizing: border-box;
   }
 }
