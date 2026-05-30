@@ -1,14 +1,18 @@
+// Application repositories.
+// Handles backend API calls and maps request/response payloads for the feature.
 // Application repository layer responsible for making HTTP requests to the backend.
-import { apiClient } from '../../../global/api/apiClients'
-import API_ENDPOINTS from '../../../global/constants/apiEndpoints'
+
+import { apiClient } from '../../../shared/api/apiClients'
+import API_ENDPOINTS from '../../../shared/constants/apiEndpoints'
 import type { APIApplicationPayload } from '../services/apiApplicationPayload'
+import type { IApplicationRepository } from '../domain/ports/IApplicationRepository'
 
 export interface APIApplicationResponse {
   success: boolean
   id?: string
 }
 
-class ApplicationRepo {
+class ApplicationRepo implements IApplicationRepository {
   async submitApplication(payload: APIApplicationPayload): Promise<APIApplicationResponse> {
     const response = await apiClient.post<APIApplicationResponse>(API_ENDPOINTS.APPLICATIONS, payload)
     return {

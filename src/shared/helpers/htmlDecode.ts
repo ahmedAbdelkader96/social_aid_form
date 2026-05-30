@@ -1,3 +1,6 @@
+// Shared helper utilities.
+// Contains small utility functions used by multiple features.
+
 export function htmlDecode(input: string | undefined | null): string {
   if (!input) return ''
   const s = String(input)

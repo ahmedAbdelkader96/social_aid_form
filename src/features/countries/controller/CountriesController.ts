@@ -1,11 +1,14 @@
-import CountriesRepo from '../repo/CountriesRepo'
+// Countries controller layer.
+// Coordinates country data fetching and maps repository results to the feature.
+
+import type { ICountriesRepository } from '../domain/ports/ICountriesRepository'
 import CountryModel from '../models/CountryModel'
 
 class CountriesController {
-  private countriesRepo: CountriesRepo
+  private countriesRepo: ICountriesRepository
 
-  constructor() {
-    this.countriesRepo = new CountriesRepo()
+  constructor(countriesRepo: ICountriesRepository) {
+    this.countriesRepo = countriesRepo
     this.fetchCountries = this.fetchCountries.bind(this)
   }
 

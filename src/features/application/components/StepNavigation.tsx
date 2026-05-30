@@ -1,4 +1,7 @@
+// Application UI component.
+// This folder contains reusable components for the application form feature.
 // Navigation controls for moving between application form steps.
+
 import { useTranslation } from 'react-i18next'
 import type { FC } from 'react'
 import styles from '../styles/ApplicationForm.module.css'

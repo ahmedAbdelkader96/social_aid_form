@@ -1,3 +1,6 @@
+// Global services.
+// Holds cross-cutting services like persistence adapters.
+
 import type { ApplicationState } from '../../features/application/models/applicationTypes'
 import type { CountriesState } from '../../features/countries/stores/countriesSlice'
 

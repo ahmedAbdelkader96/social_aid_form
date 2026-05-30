@@ -1,4 +1,6 @@
-// Root application component; renders the main feature UI.
+// Root application component.
+// Renders the top-level feature screen and connects the app entrypoint to the UI.
+
 import { ApplicationForm } from './features/application/screens/ApplicationForm'
 
 function App() {

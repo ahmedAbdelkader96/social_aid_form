@@ -1,3 +1,6 @@
+// Country domain models.
+// Defines country data shapes and type contracts for the feature.
+
 export interface CountryJSON {
   id?: string
   code: string

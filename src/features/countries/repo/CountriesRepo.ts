@@ -1,8 +1,13 @@
-import { apiClient } from '../../../global/api/apiClients'
-import CountryModel, { type CountryJSON } from '../models/CountryModel'
-import API_ENDPOINTS from '../../../global/constants/apiEndpoints'
+// Countries repositories.
+// Handles HTTP requests and data mapping for country resources.
+// Countries repository.
 
-class CountriesRepo {
+import { apiClient } from '../../../shared/api/apiClients'
+import CountryModel, { type CountryJSON } from '../models/CountryModel'
+import API_ENDPOINTS from '../../../shared/constants/apiEndpoints'
+import type { ICountriesRepository } from '../domain/ports/ICountriesRepository'
+
+class CountriesRepo implements ICountriesRepository {
   async fetchCountries(): Promise<CountryModel[]> {
     const response = await apiClient.get<CountryJSON[]>(API_ENDPOINTS.COUNTRIES)
     

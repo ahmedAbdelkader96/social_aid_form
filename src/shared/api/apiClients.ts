@@ -1,3 +1,6 @@
+// Global API infrastructure.
+// Contains shared HTTP and OpenAI client adapters used by feature services.
+
 import axios from "axios";
 // import { clearTokensAndUserName, decryptAndGetTokens } from "../helpers/storageTokens";
 

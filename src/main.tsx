@@ -1,10 +1,14 @@
+// Application bootstrap entry point.
+// Mounts React and connects the store and global providers.
+// Mounts React and connects the store, router, and global providers.
 // Entry point for the React app; mounts the root component to the DOM.
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { store } from './app/store'
 import './index.css'
-import './global/i18n'
+import './shared/i18n'
 import App from './App'
 
 createRoot(document.getElementById('root')!).render(

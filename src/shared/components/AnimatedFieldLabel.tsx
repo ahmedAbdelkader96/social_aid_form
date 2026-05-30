@@ -1,3 +1,6 @@
+// Shared UI components.
+// Provides reusable presentational components used by multiple features.
+
 import { motion } from 'framer-motion'
 import type { FC, PropsWithChildren } from 'react'
 

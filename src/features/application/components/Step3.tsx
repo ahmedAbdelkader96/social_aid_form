@@ -1,4 +1,7 @@
+// Application UI component.
+// This folder contains reusable components for the application form feature.
 // Third form step for narrative fields and AI help generation.
+
 import { useTranslation } from 'react-i18next'
 import type { FC } from 'react'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'

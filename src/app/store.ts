@@ -1,8 +1,10 @@
-// Redux store configuration and persistence wiring for the application state.
+// Redux store configuration and persistence wiring.
+// Combines feature reducers and wires localStorage persistence for app state.
+
 import { configureStore } from '@reduxjs/toolkit'
 import { applicationReducer } from '../features/application/stores'
 import { countriesReducer } from '../features/countries/stores'
-import { loadPersistedState, savePersistedState } from '../global/services/storageService'
+import { loadPersistedState, savePersistedState } from '../shared/services/storageService'
 
 const preloadedState = loadPersistedState()
 

@@ -1,5 +1,8 @@
+// Redux slice for country state.
+// Contains reducers and async actions for country loading and storage.
+
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import CountriesController from '../controller/CountriesController'
+import { countriesController } from '../../../app/di'
 import CountryModel from '../models/CountryModel'
 
 export interface CountriesState {
@@ -29,8 +32,7 @@ export const fetchCountriesAsync = createAsyncThunk<
   }
 
   try {
-    const controller = new CountriesController()
-    return await controller.fetchCountries()
+    return await countriesController.fetchCountries()
   } catch (error: any) {
     return rejectWithValue(error?.message ?? 'Failed to load countries.')
   }

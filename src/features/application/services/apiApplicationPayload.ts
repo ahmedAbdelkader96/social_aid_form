@@ -1,3 +1,6 @@
+// Application service implementations.
+// Implements domain services like AI suggestion generation for the application feature.
+
 export interface APIApplicationPayload {
   name: string
   nationalId: string

@@ -1,4 +1,7 @@
+// Internationalization setup.
+// Configures translation resources and language handling for the app.
 // Internationalization configuration for English and Arabic translations.
+
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 

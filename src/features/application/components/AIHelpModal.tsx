@@ -1,4 +1,7 @@
+// Application UI component.
+// This folder contains reusable components for the application form feature.
 // Modal component for displaying and accepting AI-generated help suggestions.
+
 import { useTranslation } from 'react-i18next'
 import type { FC } from 'react'
  

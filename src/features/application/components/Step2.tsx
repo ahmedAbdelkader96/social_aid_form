@@ -1,4 +1,7 @@
+// Application UI component.
+// This folder contains reusable components for the application form feature.
 // Second form step for family, employment, and financial details.
+
 import { useTranslation } from 'react-i18next'
 import type { FC } from 'react'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'

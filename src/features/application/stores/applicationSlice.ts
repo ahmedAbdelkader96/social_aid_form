@@ -1,11 +1,12 @@
+// Redux slice for application state.
+// Defines reducers, actions, and async thunks for the application feature.
 // Application feature Redux slice implementation defining state, reducers, and actions.
+
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { ApplicationState, ApplicationFormValues, ApplicationLanguage } from '../models/applicationTypes'
 import { defaultForm } from '../models/applicationTypes'
-import ApplicationController from '../controller/ApplicationController'
-
-const applicationController = new ApplicationController()
+import { applicationController } from '../../../app/di'
 
 const initialState: ApplicationState = {
   currentStep: 1,

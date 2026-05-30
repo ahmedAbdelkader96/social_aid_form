@@ -1,4 +1,7 @@
+// Application UI component.
+// This folder contains reusable components for the application form feature.
 // Visual progress bar component for showing application step completion.
+
 import { useMemo } from 'react'
 import type { FC } from 'react'
 import styles from '../styles/ApplicationForm.module.css'

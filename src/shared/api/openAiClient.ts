@@ -1,3 +1,6 @@
+// Global API infrastructure.
+// Contains shared HTTP and OpenAI client adapters used by feature services.
+
 type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
 
 const OPENAI_API_URL = typeof import.meta !== 'undefined' && import.meta.env?.VITE_OPENAI_API_URL

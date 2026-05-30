@@ -1,7 +1,10 @@
-// Application controller layer defining feature business logic and payload transformation.
+// Application controller layer.
+// Orchestrates feature business rules and delegates to repository implementations.
+
 import type { ApplicationFormValues } from '../models/applicationTypes'
-import ApplicationRepo, { type APIApplicationResponse } from '../repo/ApplicationRepo'
+import type { APIApplicationResponse } from '../repo/ApplicationRepo'
 import type { APIApplicationPayload } from '../services/apiApplicationPayload'
+import type { IApplicationRepository } from '../domain/ports/IApplicationRepository'
 
 export interface ApplicationSubmitResult {
   success: boolean
@@ -17,10 +20,10 @@ function normalizeApplicationPayload(values: ApplicationFormValues): APIApplicat
 }
 
 class ApplicationController {
-  private applicationRepo: ApplicationRepo
+  private applicationRepo: IApplicationRepository
 
-  constructor() {
-    this.applicationRepo = new ApplicationRepo()
+  constructor(applicationRepo: IApplicationRepository) {
+    this.applicationRepo = applicationRepo
     this.submitApplication = this.submitApplication.bind(this)
   }
 

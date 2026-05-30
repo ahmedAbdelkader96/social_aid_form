@@ -1,4 +1,7 @@
+// Typed Redux hooks.
+// Provides typed useAppDispatch and useAppSelector for the application store.
 // Typed hooks for accessing the Redux dispatch and selector with the app store types.
+
 import type { TypedUseSelectorHook } from 'react-redux'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState, AppDispatch } from './store'
