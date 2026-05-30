@@ -32,48 +32,12 @@ const AnimatedFieldLabel: FC<PropsWithChildren<{ delayIndex: number }>> = ({ del
     initial="hidden"
     animate="visible"
   >
-    {children}
-  </motion.label>
-)
-import CountryModel from '../../countries/models/CountryModel'
-import { fetchCountriesAsync } from '../../countries/stores'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import styles from '../styles/ApplicationForm.module.css'
-
-interface Step1Props {
-  register: UseFormRegister<ApplicationFormValues>
-  setValue: UseFormSetValue<ApplicationFormValues>
-  getValues: UseFormGetValues<ApplicationFormValues>
-  errors: FieldErrors<ApplicationFormValues>
-}
-
-export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors }) => {
-  const { t, i18n } = useTranslation()
-  const dispatch = useAppDispatch()
-  const countriesState = useAppSelector((state) => state.countries)
-  const locale = i18n.language.startsWith('ar') ? 'ar' : 'en'
-
-  const countryOptions = countriesState.items
-  const dialCodeOptions = countriesState.items
-  const loading = countriesState.status === 'loading'
-
-  useEffect(() => {
-    dispatch(fetchCountriesAsync())
-  }, [dispatch]) 
-
-  const [countryQuery, setCountryQuery] = useState('')
-  const [countryOpen, setCountryOpen] = useState(false)
-  const [selectedCountry, setSelectedCountry] = useState<CountryModel | null>(null)
-
-  const [dialQuery, setDialQuery] = useState('')
-  const [dialOpen, setDialOpen] = useState(false)
-  const [selectedDial, setSelectedDial] = useState<CountryModel | null>(null)
-
-  const countryRef = useRef<HTMLDivElement>(null)
-  const dialRef = useRef<HTMLDivElement>(null)
-
-  const dateInputRef = useRef<HTMLInputElement | null>(null)
-
+        <input
+          type="date"
+          {...register('dateOfBirth', { required: true })}
+          className={styles.fieldInput}
+          aria-invalid={!!errors.dateOfBirth}
+        />
   const [isTouchInput, setIsTouchInput] = useState(false)
 
   useEffect(() => {
