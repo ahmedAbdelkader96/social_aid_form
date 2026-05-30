@@ -72,6 +72,8 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
   const countryRef = useRef<HTMLDivElement>(null)
   const dialRef = useRef<HTMLDivElement>(null)
 
+  const dateInputRef = useRef<HTMLInputElement | null>(null)
+
   const [isTouchInput, setIsTouchInput] = useState(false)
 
   useEffect(() => {
@@ -83,43 +85,6 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
     )
     setIsTouchInput(Boolean(hasTouch))
   }, [])
-
-  // Desktop-friendly DOB inputs (day/month/year) state and helper
-  const [dobDay, setDobDay] = useState('')
-  const [dobMonth, setDobMonth] = useState('')
-  const [dobYear, setDobYear] = useState('')
-
-  useEffect(() => {
-    const val = getValues('dateOfBirth')
-    if (val) {
-      const m = val.match(/(\d{4})-(\d{2})-(\d{2})/)
-      if (m) {
-        setDobYear(m[1])
-        setDobMonth(m[2])
-        setDobDay(m[3])
-      }
-    }
-  }, [getValues])
-
-  const handleDobPartChange = (part: 'day' | 'month' | 'year', raw: string) => {
-    const digits = raw.replace(/[^0-9]/g, '')
-    if (part === 'day') setDobDay(digits.slice(0, 2))
-    if (part === 'month') setDobMonth(digits.slice(0, 2))
-    if (part === 'year') setDobYear(digits.slice(0, 4))
-
-    const day = part === 'day' ? digits.slice(0, 2) : dobDay
-    const month = part === 'month' ? digits.slice(0, 2) : dobMonth
-    const year = part === 'year' ? digits.slice(0, 4) : dobYear
-
-    if (year.length === 4 && month.length >= 1 && day.length >= 1) {
-      const mm = month.padStart(2, '0')
-      const dd = day.padStart(2, '0')
-      const iso = `${year}-${mm}-${dd}`
-      setValue('dateOfBirth', iso, { shouldDirty: true, shouldValidate: true })
-    } else {
-      setValue('dateOfBirth', '', { shouldDirty: true })
-    }
-  }
 
   const getDisplayName = (entry: CountryModel | null | undefined) => {
     if (!entry) return ''
@@ -272,48 +237,38 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
       </AnimatedFieldLabel>
       <AnimatedFieldLabel delayIndex={2}>
         {t('dob')}
-        {isTouchInput ? (
+        <div className={styles.dateWrapper}>
           <input
+            ref={dateInputRef}
             type="date"
             {...register('dateOfBirth', { required: true })}
             className={styles.fieldInput}
             aria-invalid={!!errors.dateOfBirth}
-            readOnly
-            onKeyDown={(e) => e.preventDefault()}
-            onPaste={(e) => e.preventDefault()}
           />
-        ) : (
-          <div className={styles.dobGroup}>
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={2}
-              placeholder="DD"
-              value={dobDay}
-              onChange={(e) => handleDobPartChange('day', e.target.value)}
-              className={`${styles.fieldInput} ${styles.dobPart}`}
-            />
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={2}
-              placeholder="MM"
-              value={dobMonth}
-              onChange={(e) => handleDobPartChange('month', e.target.value)}
-              className={`${styles.fieldInput} ${styles.dobPart}`}
-            />
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={4}
-              placeholder="YYYY"
-              value={dobYear}
-              onChange={(e) => handleDobPartChange('year', e.target.value)}
-              className={`${styles.fieldInput} ${styles.dobYear}`}
-            />
-            <input type="hidden" {...register('dateOfBirth', { required: true })} value={getValues('dateOfBirth') || ''} />
-          </div>
-        )}
+          <button
+            type="button"
+            className={styles.dateIconButton}
+            onClick={() => {
+              const el = dateInputRef.current as any
+              if (el) {
+                // Prefer the standardized showPicker() when available (Chromium)
+                if (typeof el.showPicker === 'function') {
+                  try { el.showPicker() } catch (e) { el.focus() }
+                } else {
+                  el.focus()
+                }
+              }
+            }}
+            aria-label={t('openCalendar')}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M7 11H9V13H7zM11 11H13V13H11zM15 11H17V13H15z" fill="#374151" />
+              <path d="M7 3V5" stroke="#374151" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M17 3V5" stroke="#374151" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <rect x="3" y="5" width="18" height="16" rx="3" stroke="#374151" strokeWidth="1.2" />
+            </svg>
+          </button>
+        </div>
         {errors.dateOfBirth && <span className={styles.errorText}>{t('required')}</span>}
       </AnimatedFieldLabel>
       <AnimatedFieldLabel delayIndex={3}>

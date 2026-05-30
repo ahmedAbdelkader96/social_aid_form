@@ -496,6 +496,35 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
+/* Wrapper for date input to allow a clickable calendar icon without changing input sizing */
+.dateWrapper {
+  position: relative;
+}
+
+.dateWrapper .fieldInput {
+  /* ensure padding on the right so the calendar button doesn't overlap text */
+  padding-right: 52px;
+}
+
+.dateIconButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 0;
+}
+
+.dateIconButton svg { display: block; }
+
 input[type="date"][readonly] {
   cursor: pointer;
 }
