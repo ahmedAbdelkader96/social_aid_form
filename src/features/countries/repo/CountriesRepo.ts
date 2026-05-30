@@ -1,11 +1,10 @@
 import { apiClient } from '../../../global/api/apiClients'
 import CountryModel, { type CountryJSON } from '../models/CountryModel'
-
-const COUNTRIES_ENDPOINT = '/countries'
+import API_ENDPOINTS from '../../../global/constants/apiEndpoints'
 
 class CountriesRepo {
   async fetchCountries(): Promise<CountryModel[]> {
-    const response = await apiClient.get<CountryJSON[]>(COUNTRIES_ENDPOINT)
+    const response = await apiClient.get<CountryJSON[]>(API_ENDPOINTS.COUNTRIES)
     
     console.log('📡 API Response:', response.data)
     console.log('Total countries:', response.data.length)
