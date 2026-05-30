@@ -75,21 +75,51 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
   const [isTouchInput, setIsTouchInput] = useState(false)
 
   useEffect(() => {
-    // Prefer a user-agent check for mobile to avoid treating touch-capable
-    // Windows laptops (with touch screens) as 'mobile' which would block
-    // keyboard entry. Fall back to pointer detection if UA is unavailable.
-    let mobile = false
-    try {
-      const ua = navigator.userAgent || ''
-      mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua)
-    } catch (e) {
-      // fallback to pointer detection
-      mobile = typeof window !== 'undefined' && (
-        'ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
-      )
-    }
-    setIsTouchInput(Boolean(mobile))
+    // Detect touch-capable devices (mobile/tablet). On these devices we will
+    // make the date input read-only so tapping shows the native picker but
+    // typing is disabled. Desktop users keep keyboard entry enabled.
+    const hasTouch = typeof window !== 'undefined' && (
+      'ontouchstart' in window || navigator.maxTouchPoints > 0 || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
+    )
+    setIsTouchInput(Boolean(hasTouch))
   }, [])
+
+  // Desktop-friendly DOB inputs (day/month/year) state and helper
+  const [dobDay, setDobDay] = useState('')
+  const [dobMonth, setDobMonth] = useState('')
+  const [dobYear, setDobYear] = useState('')
+
+  useEffect(() => {
+    const val = getValues('dateOfBirth')
+    if (val) {
+      const m = val.match(/(\d{4})-(\d{2})-(\d{2})/)
+      if (m) {
+        setDobYear(m[1])
+        setDobMonth(m[2])
+        setDobDay(m[3])
+      }
+    }
+  }, [getValues])
+
+  const handleDobPartChange = (part: 'day' | 'month' | 'year', raw: string) => {
+    const digits = raw.replace(/[^0-9]/g, '')
+    if (part === 'day') setDobDay(digits.slice(0, 2))
+    if (part === 'month') setDobMonth(digits.slice(0, 2))
+    if (part === 'year') setDobYear(digits.slice(0, 4))
+
+    const day = part === 'day' ? digits.slice(0, 2) : dobDay
+    const month = part === 'month' ? digits.slice(0, 2) : dobMonth
+    const year = part === 'year' ? digits.slice(0, 4) : dobYear
+
+    if (year.length === 4 && month.length >= 1 && day.length >= 1) {
+      const mm = month.padStart(2, '0')
+      const dd = day.padStart(2, '0')
+      const iso = `${year}-${mm}-${dd}`
+      setValue('dateOfBirth', iso, { shouldDirty: true, shouldValidate: true })
+    } else {
+      setValue('dateOfBirth', '', { shouldDirty: true })
+    }
+  }
 
   const getDisplayName = (entry: CountryModel | null | undefined) => {
     if (!entry) return ''
@@ -242,19 +272,48 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
       </AnimatedFieldLabel>
       <AnimatedFieldLabel delayIndex={2}>
         {t('dob')}
-        <input
-          type="date"
-          {...register('dateOfBirth', { required: true })}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.dateOfBirth}
-          readOnly={isTouchInput}
-          onKeyDown={(e) => {
-            if (isTouchInput) e.preventDefault()
-          }}
-          onPaste={(e) => {
-            if (isTouchInput) e.preventDefault()
-          }}
-        />
+        {isTouchInput ? (
+          <input
+            type="date"
+            {...register('dateOfBirth', { required: true })}
+            className={styles.fieldInput}
+            aria-invalid={!!errors.dateOfBirth}
+            readOnly
+            onKeyDown={(e) => e.preventDefault()}
+            onPaste={(e) => e.preventDefault()}
+          />
+        ) : (
+          <div className={styles.dobGroup}>
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={2}
+              placeholder="DD"
+              value={dobDay}
+              onChange={(e) => handleDobPartChange('day', e.target.value)}
+              className={`${styles.fieldInput} ${styles.dobPart}`}
+            />
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={2}
+              placeholder="MM"
+              value={dobMonth}
+              onChange={(e) => handleDobPartChange('month', e.target.value)}
+              className={`${styles.fieldInput} ${styles.dobPart}`}
+            />
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="YYYY"
+              value={dobYear}
+              onChange={(e) => handleDobPartChange('year', e.target.value)}
+              className={`${styles.fieldInput} ${styles.dobYear}`}
+            />
+            <input type="hidden" {...register('dateOfBirth', { required: true })} value={getValues('dateOfBirth') || ''} />
+          </div>
+        )}
         {errors.dateOfBirth && <span className={styles.errorText}>{t('required')}</span>}
       </AnimatedFieldLabel>
       <AnimatedFieldLabel delayIndex={3}>
