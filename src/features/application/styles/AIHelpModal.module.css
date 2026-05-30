@@ -17,6 +17,11 @@
   overflow: hidden;
 }
 
+/* ensure absolute-positioned children can be placed relative to modal */
+.modalContent {
+  position: relative;
+}
+
 .modalHeader {
   display: flex;
   justify-content: space-between;
@@ -41,6 +46,39 @@
   color: #374151;
   font-size: 1.35rem;
   cursor: pointer;
+}
+
+/* center the × glyph inside the round button reliably */
+.modalClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Mobile: place the close control centered above the header/title */
+@media (max-width: 480px) {
+  .modalHeader {
+    justify-content: center;
+    padding-top: 28px;
+    padding-bottom: 12px;
+    position: relative;
+  }
+
+  .modalClose {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 8px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .modalHeader h2 {
+    margin: 8px 0 0;
+    text-align: center;
+  }
 }
 
 .modalBody {
