@@ -75,13 +75,20 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
   const [isTouchInput, setIsTouchInput] = useState(false)
 
   useEffect(() => {
-    // Detect touch-capable devices (mobile/tablet). On these devices we will
-    // make the date input read-only so tapping shows the native picker but
-    // typing is disabled. Desktop users keep keyboard entry enabled.
-    const hasTouch = typeof window !== 'undefined' && (
-      'ontouchstart' in window || navigator.maxTouchPoints > 0 || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
-    )
-    setIsTouchInput(Boolean(hasTouch))
+    // Prefer a user-agent check for mobile to avoid treating touch-capable
+    // Windows laptops (with touch screens) as 'mobile' which would block
+    // keyboard entry. Fall back to pointer detection if UA is unavailable.
+    let mobile = false
+    try {
+      const ua = navigator.userAgent || ''
+      mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua)
+    } catch (e) {
+      // fallback to pointer detection
+      mobile = typeof window !== 'undefined' && (
+        'ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
+      )
+    }
+    setIsTouchInput(Boolean(mobile))
   }, [])
 
   const getDisplayName = (entry: CountryModel | null | undefined) => {
