@@ -1,0 +1,50 @@
+.progressSection {
+  display: grid;
+  gap: 14px;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.progressWrapper {
+  width: 100%;
+}
+
+.progressSegments {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.progressSegment {
+  height: 16px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  transition: background 0.3s ease;
+}
+
+.segmentActive {
+  background: linear-gradient(90deg, #6d28d9, #2563eb);
+}
+
+.stepDot {
+  width: 100%;
+  min-width: 40px;
+  padding: 10px 0;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #6b7280;
+  text-align: center;
+  font-weight: 600;
+}
+
+.activeStep {
+  background: #eef2ff;
+  color: #1d4ed8;
+  box-shadow: 0 8px 18px rgba(59, 130, 246, 0.12);
+}
