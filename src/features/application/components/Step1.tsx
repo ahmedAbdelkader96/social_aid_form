@@ -72,16 +72,6 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
 
   const countryRef = useRef<HTMLDivElement>(null)
   const dialRef = useRef<HTMLDivElement>(null)
-  const dateInputRef = useRef<HTMLInputElement | null>(null)
-
-  const [isTouchInput, setIsTouchInput] = useState(false)
-
-  useEffect(() => {
-    const hasTouch = typeof window !== 'undefined' && (
-      'ontouchstart' in window || navigator.maxTouchPoints > 0 || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
-    )
-    setIsTouchInput(Boolean(hasTouch))
-  }, [])
 
   const getDisplayName = (entry: CountryModel | null | undefined) => {
     if (!entry) return ''
@@ -206,7 +196,6 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
       <AnimatedFieldLabel delayIndex={2}>
         {t('dob')}
         <input
-          ref={dateInputRef}
           type="date"
           {...register('dateOfBirth', { required: true })}
           className={styles.fieldInput}
