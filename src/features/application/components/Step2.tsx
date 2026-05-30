@@ -1,35 +1,10 @@
 // Second form step for family, employment, and financial details.
-import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import type { FC, PropsWithChildren } from 'react'
+import type { FC } from 'react'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 import type { ApplicationFormValues } from '../models/applicationTypes'
+import { AnimatedFieldLabel } from '../../../shared/components/AnimatedFieldLabel'
 import styles from '../styles/ApplicationForm.module.css'
-
-const fieldVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (custom: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.35,
-      ease: 'easeOut',
-      delay: custom * 0.06,
-    },
-  }),
-}
-
-const AnimatedFieldLabel: FC<PropsWithChildren<{ delayIndex: number }>> = ({ delayIndex, children }) => (
-  <motion.label
-    className={styles.fieldLabel}
-    variants={fieldVariants}
-    custom={delayIndex}
-    initial="hidden"
-    animate="visible"
-  >
-    {children}
-  </motion.label>
-)
 
 interface Step2Props {
   register: UseFormRegister<ApplicationFormValues>

@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ChangeEvent, FC, PropsWithChildren } from 'react'
+import type { ChangeEvent, FC } from 'react'
 import type {
   FieldErrors,
   UseFormGetValues,
@@ -11,35 +11,11 @@ import type {
 } from 'react-hook-form'
 import type { ApplicationFormValues } from '../models/applicationTypes'
 
+import { AnimatedFieldLabel } from '../../../shared/components/AnimatedFieldLabel'
 import CountryModel from '../../countries/models/CountryModel'
 import { fetchCountriesAsync } from '../../countries/stores'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import styles from '../styles/ApplicationForm.module.css'
-
-const fieldVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (custom: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.36,
-      ease: 'easeOut',
-      delay: custom * 0.05,
-    },
-  }),
-}
-
-const AnimatedFieldLabel: FC<PropsWithChildren<{ delayIndex: number }>> = ({ delayIndex, children }) => (
-  <motion.label
-    className={styles.fieldLabel}
-    variants={fieldVariants}
-    custom={delayIndex}
-    initial="hidden"
-    animate="visible"
-  >
-    {children}
-  </motion.label>
-)
 
 interface Step1Props {
   register: UseFormRegister<ApplicationFormValues>

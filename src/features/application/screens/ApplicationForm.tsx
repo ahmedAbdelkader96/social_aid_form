@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import {
   setLanguage,
   setStep,
@@ -11,18 +11,18 @@ import {
   setSubmitStatus,
   submitApplicationAsync,
   updateForm,
-} from './stores'
-import { generateOpenAISuggestion } from '../../global/api/openAiClient'
-import { htmlDecode } from '../../global/helpers/htmlDecode'
-import { ProgressBar } from './components/ProgressBar'
-import { StepNavigation } from './components/StepNavigation'
-import { AIHelpModal } from './components/AIHelpModal'
-import { Step1 } from './components/Step1'
-import { Step2 } from './components/Step2'
-import { Step3 } from './components/Step3'
-import { defaultForm } from './models/applicationTypes'
-import type { ApplicationFormValues } from './models/applicationTypes'
-import styles from './styles/ApplicationForm.module.css'
+} from '../stores'
+import { generateOpenAISuggestion } from '../../../global/api/openAiClient'
+import { htmlDecode } from '../../../global/helpers/htmlDecode'
+import { ProgressBar } from '../components/ProgressBar'
+import { StepNavigation } from '../components/StepNavigation'
+import { AIHelpModal } from '../components/AIHelpModal'
+import { Step1 } from '../components/Step1'
+import { Step2 } from '../components/Step2'
+import { Step3 } from '../components/Step3'
+import { defaultForm } from '../models/applicationTypes'
+import type { ApplicationFormValues } from '../models/applicationTypes'
+import styles from '../styles/ApplicationForm.module.css'
 
 const stepLabels = ['personalInformation', 'familyFinancialInfo', 'situationDescriptions'] as const
 
