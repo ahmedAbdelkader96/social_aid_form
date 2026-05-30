@@ -72,6 +72,18 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
   const countryRef = useRef<HTMLDivElement>(null)
   const dialRef = useRef<HTMLDivElement>(null)
 
+  const [isTouchInput, setIsTouchInput] = useState(false)
+
+  useEffect(() => {
+    // Detect touch-capable devices (mobile/tablet). On these devices we will
+    // make the date input read-only so tapping shows the native picker but
+    // typing is disabled. Desktop users keep keyboard entry enabled.
+    const hasTouch = typeof window !== 'undefined' && (
+      'ontouchstart' in window || navigator.maxTouchPoints > 0 || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
+    )
+    setIsTouchInput(Boolean(hasTouch))
+  }, [])
+
   const getDisplayName = (entry: CountryModel | null | undefined) => {
     if (!entry) return ''
     
@@ -228,8 +240,13 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, errors })
           {...register('dateOfBirth', { required: true })}
           className={styles.fieldInput}
           aria-invalid={!!errors.dateOfBirth}
-          onKeyDown={(e) => e.preventDefault()}
-          onPaste={(e) => e.preventDefault()}
+          readOnly={isTouchInput}
+          onKeyDown={(e) => {
+            if (isTouchInput) e.preventDefault()
+          }}
+          onPaste={(e) => {
+            if (isTouchInput) e.preventDefault()
+          }}
         />
         {errors.dateOfBirth && <span className={styles.errorText}>{t('required')}</span>}
       </AnimatedFieldLabel>
