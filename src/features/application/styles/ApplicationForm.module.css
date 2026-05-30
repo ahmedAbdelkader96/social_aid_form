@@ -8,24 +8,6 @@
 input,
 select,
 textarea,
-
-  /* Make dial selector and phone input appear side-by-side on small screens */
-  .phoneInputGroup {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .dialButton {
-    min-width: 88px;
-    padding: 0 8px;
-    justify-content: flex-start;
-  }
-
-  .dialButtonCode {
-    padding: 6px 8px;
-  }
 button {
   font-family: inherit;
   font-size: inherit;
@@ -60,11 +42,11 @@ button {
   gap: 24px;
   align-items: flex-start;
 }
-    width: 100%;
-    height: 56px;
-    padding: 14px 12px;
-    box-sizing: border-box;
-    cursor: pointer;
+
+.title {
+  margin: 0;
+  font-size: clamp(2rem, 2.5vw, 2.65rem);
+  line-height: 1.05;
   color: #111827;
 }
 
@@ -184,8 +166,8 @@ button {
   gap: 12px;
   min-height: 56px;
   width: auto;
-  min-width: 92px;
-  padding: 0 10px;
+  min-width: 120px;
+  padding: 0 14px;
   border: 1px solid #d1d5db;
   border-radius: 16px;
   background: #ffffff;
@@ -681,6 +663,37 @@ select:focus,
     min-height: auto;
   }
 
+  /* Make dial selector and phone input sit side-by-side on small screens
+     with a compact dial column and flexible phone input */
+  .phoneInputGroup {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* Narrower dial button / select to match flag + code only */
+  .dialButton,
+  .dialCodeSelect,
+  .countryInput {
+    min-width: 88px;
+    width: 88px;
+    height: 56px;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  .dialButton {
+    align-self: center;
+    justify-self: start;
+  }
+
+  .dialButtonLabel {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .fieldInput,
   .fieldTextarea,
   .languageSelect,
@@ -688,8 +701,7 @@ select:focus,
   input[type="time"],
   input[type="datetime-local"],
   select,
-  .countrySearchInput,
-  .countryInput {
+  .countrySearchInput {
     width: 100%;
     height: 56px;
     padding: 14px 16px;
