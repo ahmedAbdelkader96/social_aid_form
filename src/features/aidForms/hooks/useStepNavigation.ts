@@ -5,7 +5,7 @@ import type { AppDispatch } from '../../../app/store'
 import type { AidFormStep, AidFormValues } from '../types/aidFormTypes'
 import { stepDefinitions } from '../stepDefinitions'
 import { setStep, updateForm } from '../stores'
-import { getFirstErrorMessage } from '../utils/formValidation'
+import { getFirstErrorMessage, validateFields } from '../utils/formValidation'
 
 interface UseStepNavigationParams {
   currentStep: AidFormStep
@@ -29,69 +29,60 @@ export function useStepNavigation({
   const currentStepDefinition = useMemo(() => stepDefinitions[currentStep], [currentStep])
   const currentFields = currentStepDefinition.fields
   const stepTitle = currentStepDefinition.title
+  const currentFieldNames = useMemo(
+    () => currentFields as Array<keyof AidFormValues>,
+    [currentFields],
+  )
 
   const saveProgress = useCallback(() => {
     dispatch(updateForm(getValues()))
   }, [dispatch, getValues])
 
-  const getCurrentFieldValues = useCallback(() => {
-    const readDomValue = (name: string) => {
-      try {
-        const el = document.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[name="${name}"]`)
-        if (el) return el.value
-      } catch {
-        // ignore
-      }
-      return undefined
-    }
+  const getCurrentFieldValues = useCallback(
+    () => getValues() as AidFormValues,
+    [getValues],
+  )
 
-    return currentFields.reduce((acc, field) => {
-      const val = getValues(field)
-      const fallback = val === undefined || val === null || String(val) === '' ? readDomValue(field) : val
-      return { ...acc, [field]: fallback ?? val } as Partial<AidFormValues>
-    }, {} as Partial<AidFormValues>) as AidFormValues
-  }, [currentFields, getValues])
+  const handleInvalidSubmit = useCallback(async () => {
+    const isValid = await trigger(currentFieldNames)
+    const refreshedErrors = getCurrentErrors()
+    const values = getCurrentFieldValues()
+    const message = getFirstErrorMessage(values, currentFields, refreshedErrors, t)
 
-  const handleInvalidSubmit = useCallback(() => {
-    // Ensure we trigger validations for each field in order so RHF state is fresh
-    void (async () => {
-      for (const f of currentFields) {
-        await trigger(f as unknown as keyof AidFormValues)
-      }
+    // (no-op) handled by UI toast
 
-      const refreshedErrors = getCurrentErrors()
-
-      // Re-read current values after triggers so validation uses fresh input
-      const values = getCurrentFieldValues()
-      const message = getFirstErrorMessage(values, currentFields, refreshedErrors, t)
+    if (!isValid) {
       showToast(message || t('pleaseFixErrors'), 'error')
-    })()
-  }, [currentFields, currentFields.length, getCurrentErrors, getCurrentFieldValues, showToast, t, trigger])
+    }
+  }, [currentFields, currentFieldNames, currentStep, getCurrentErrors, getCurrentFieldValues, showToast, t, trigger])
 
   const handleNext = useCallback(async () => {
+    const values = getCurrentFieldValues()
 
-    // Trigger validations sequentially to ensure the order matches the UI grid
-    let isValid = true
-    for (const f of currentFields) {
-       
-       
-      const ok = await trigger(f as unknown as keyof AidFormValues)
-      if (!ok) isValid = false
+    // pre-validate by values before triggering RHF validation
+
+    // First validate by actual values to ensure required fields are present
+    // This prevents advancing when complex widgets haven't written their
+    // values into RHF state yet.
+    const validationResult = validateFields(values, currentFields, t)
+    if (!validationResult.valid) {
+      const message = getFirstErrorMessage(values, currentFields, getCurrentErrors(), t)
+      showToast(message || t('pleaseFixErrors'), 'error')
+      return
     }
 
+    // Now run RHF's trigger for pattern/format validations
+    const isValid = await trigger(currentFieldNames)
     if (isValid) {
       saveProgress()
       dispatch(setStep((currentStep + 1) as AidFormStep))
       return
     }
 
-    // allow RHF state to settle then compute message from refreshed errors
-    await new Promise((resolve) => setTimeout(resolve, 0))
     const currentErrors = getCurrentErrors()
-    const values = getCurrentFieldValues()
     const message = getFirstErrorMessage(values, currentFields, currentErrors, t)
     showToast(message || t('pleaseFixErrors'), 'error')
-  }, [currentStep, currentFields, dispatch, getCurrentErrors, getCurrentFieldValues, saveProgress, showToast, t, trigger])
+  }, [currentStep, currentFields, currentFieldNames, dispatch, getCurrentErrors, getCurrentFieldValues, saveProgress, showToast, t, trigger])
 
   const handleBack = useCallback(() => {
     dispatch(setStep((currentStep - 1) as AidFormStep))

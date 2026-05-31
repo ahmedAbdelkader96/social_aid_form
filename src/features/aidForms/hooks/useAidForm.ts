@@ -8,6 +8,7 @@ import { useAiSuggestion } from './useAiSuggestion'
 import { useFormSubmission } from './useFormSubmission'
 import { useLanguageSync } from './useLanguageSync'
 import { useToast } from './useToast'
+import { FORM_VALIDATION_MODE, FORM_REVALIDATE_MODE } from '../../../shared/constants'
 import { AID_FORM_SUBMIT_STATUS } from '../types/aidFormTypes'
 import type { AidFormLanguage, AidFormValues } from '../types/aidFormTypes'
 
@@ -30,14 +31,18 @@ export function useAidForm() {
     formState,
     clearErrors,
   } = useForm<AidFormValues>({
-    mode: 'onBlur',
-    reValidateMode: 'onChange',
+    mode: FORM_VALIDATION_MODE,
+    reValidateMode: FORM_REVALIDATE_MODE,
     defaultValues: aidForm.form,
+    shouldUnregister: false,
   })
+
+  // (debugging helpers removed)
 
   useEffect(() => {
     reset(aidForm.form)
-  }, [aidForm.form, reset])
+  }, [])  // Only reset on mount, not on every aidForm.form change
+
 
   useLanguageSync(aidForm.language, i18n)
 
@@ -76,8 +81,8 @@ export function useAidForm() {
     dispatch,
     trigger,
     getValues,
+    reset,
     t,
-    formErrors: formState.errors,
     countries: countriesState.items,
     showToast,
     resetSuggestionState,

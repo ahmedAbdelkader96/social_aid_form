@@ -4,7 +4,9 @@
  */
 type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
 
-import { DEFAULT_AI_API_URL, DEFAULT_AI_MODEL, DEFAULT_AI_TIMEOUT, DEFAULT_AI_TEMPERATURE } from '../constants'
+import axios from 'axios'
+import { DEFAULT_AI_API_URL, DEFAULT_AI_MODEL } from '../constants'
+import { normalizeAxiosError } from '../errors'
 
 const AI_API_URL = typeof import.meta !== 'undefined' && import.meta.env?.VITE_AI_API_URL
   ? String(import.meta.env.VITE_AI_API_URL)
@@ -18,13 +20,6 @@ const AI_MODEL = typeof import.meta !== 'undefined' && import.meta.env?.VITE_AI_
   ? String(import.meta.env.VITE_AI_MODEL)
   : DEFAULT_AI_MODEL
 
-const AI_TIMEOUT = typeof import.meta !== 'undefined' && import.meta.env?.VITE_AI_TIMEOUT
-  ? Number(import.meta.env.VITE_AI_TIMEOUT)
-  : DEFAULT_AI_TIMEOUT
-
-const AI_TEMPERATURE = typeof import.meta !== 'undefined' && import.meta.env?.VITE_AI_TEMPERATURE
-  ? Number(import.meta.env.VITE_AI_TEMPERATURE)
-  : DEFAULT_AI_TEMPERATURE
 
 export async function generateAISuggestion(
   field: string,
@@ -32,9 +27,8 @@ export async function generateAISuggestion(
   promptOverride?: string,
 ): Promise<string> {
   if (!AI_API_KEY) {
-    // Fallback to a helpful default when no key is configured
     return `Suggested response for ${field}. Please provide a clear and honest answer.`
-  } 
+  }
 
   const systemMessage: ChatMessage = {
     role: 'system',
@@ -55,49 +49,25 @@ export async function generateAISuggestion(
     model: AI_MODEL,
     messages: [systemMessage, userMessage],
     max_tokens: 220,
-    temperature: AI_TEMPERATURE,
   }
 
-  const controller = new AbortController()
-  const timeoutMs = AI_TIMEOUT
-  const timeout = setTimeout(() => controller.abort(), timeoutMs)
-  
-
   try {
-    const res = await fetch(AI_API_URL, {
-      method: 'POST',
+    const response = await axios.post(AI_API_URL, body, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${AI_API_KEY}`,
       },
-      body: JSON.stringify(body),
-      signal: controller.signal,
     })
 
-    let data: unknown = null
-
-    try {
-      data = await res.json()
-    } catch {
-      data = await res.text().catch(() => null)
-    }
-
-    if (!res.ok) {
-      console.error('AI request failed', res.status, data)
-      return `Suggested response for ${field}. Please provide a clear and honest answer.`
-    }
-
-    // Try to extract assistant reply depending on provider shape
     type AIChoice = { message?: { content?: string }; text?: string }
     type AIResponse = { choices?: AIChoice[] }
-    const resp = data as AIResponse
+    const resp = response.data as AIResponse
     const reply = resp?.choices?.[0]?.message?.content || resp?.choices?.[0]?.text || ''
     return (reply && String(reply).trim()) || `Suggested response for ${field}. Please provide a clear and honest answer.`
-  } catch (err: unknown) {
-    console.error('AI request error', err)
-    return `Suggested response for ${field}. Please provide a clear and honest answer.`
-  } finally {
-    clearTimeout(timeout)
+  } catch (error: unknown) {
+    const apiError = normalizeAxiosError(error)
+    console.error('AI request error', apiError)
+    throw new Error(apiError.message, { cause: error })
   }
 }
 

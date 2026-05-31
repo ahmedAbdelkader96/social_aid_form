@@ -6,7 +6,7 @@ import { TextField } from './fields/TextField'
 import { SelectField } from './fields/SelectField'
 import { CountryLookupField } from './fields/CountryLookupField'
 import { PhoneDialField } from './fields/PhoneDialField'
-import { EMAIL_PATTERN, NUMBER_PATTERN } from '../../../shared/constants'
+import { EMAIL_PATTERN, NUMBER_PATTERN, NATIONAL_ID_PLACEHOLDER } from '../../../shared/constants'
 import { getGenderOptions } from '../utils/aidFormSelectOptions'
 import type { Step1FieldProps } from '../types/formFieldTypes'
 import { useCountries } from '../../countries/hooks/useCountries'
@@ -27,6 +27,7 @@ export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, se
         trigger={trigger}
         clearErrors={clearErrors}
         dismissToast={dismissToast}
+        setValue={setValue}
         delayIndex={0}
       />
 
@@ -39,9 +40,10 @@ export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, se
         trigger={trigger}
         clearErrors={clearErrors}
         dismissToast={dismissToast}
+        setValue={setValue}
         delayIndex={1}
         inputMode="numeric"
-        placeholder="123456789"
+        placeholder={NATIONAL_ID_PLACEHOLDER}
         registerOptions={{ pattern: { value: NUMBER_PATTERN, message: t('invalidNationalId') } }}
       />
 
@@ -53,6 +55,7 @@ export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, se
         errors={errors}
         trigger={trigger}
         clearErrors={clearErrors}
+        setValue={setValue}
         delayIndex={2}
       />
 
@@ -66,6 +69,7 @@ export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, se
         errors={errors}
         clearErrors={clearErrors}
         dismissToast={dismissToast}
+        setValue={setValue}
         delayIndex={3}
       />
 
@@ -103,6 +107,7 @@ export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, se
         trigger={trigger}
         clearErrors={clearErrors}
         dismissToast={dismissToast}
+        setValue={setValue}
         delayIndex={6}
       />
 
@@ -114,6 +119,7 @@ export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, se
         trigger={trigger}
         clearErrors={clearErrors}
         dismissToast={dismissToast}
+        setValue={setValue}
         delayIndex={7}
       />
 
@@ -125,6 +131,7 @@ export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, se
         trigger={trigger}
         clearErrors={clearErrors}
         dismissToast={dismissToast}
+        setValue={setValue}
         delayIndex={8}
       />
 
@@ -137,6 +144,7 @@ export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, se
         trigger={trigger}
         clearErrors={clearErrors}
         dismissToast={dismissToast}
+        setValue={setValue}
         delayIndex={9}
         registerOptions={{ pattern: { value: EMAIL_PATTERN, message: t('invalidEmail') } }}
       />

@@ -42,15 +42,17 @@ export const AnimatedFieldLabel: FC<PropsWithChildren<AnimatedFieldLabelProps>> 
     : firstChild as ReactNode
 
   return (
-    <motion.label
+    <motion.div
       className={className}
       variants={fieldVariants}
       custom={{ delayIndex, delayFactor }}
       initial="hidden"
       animate="visible"
     >
-      {labelText}
-      {rest}
-    </motion.label>
+      <label style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+        {labelText}
+        {rest}
+      </label>
+    </motion.div>
   )
 }

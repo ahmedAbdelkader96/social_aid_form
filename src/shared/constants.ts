@@ -1,19 +1,26 @@
 /**
  * Shared static constants used across the application.
  * Centralizing these values helps keep configuration and validation rules in one place.
+ * This follows the DRY (Don't Repeat Yourself) principle and makes updates easier.
  */
 export const STORAGE_KEY = 'socialAidPersistedState'
 
 export const DEFAULT_AI_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 export const DEFAULT_AI_MODEL = 'llama-3.3-70b-versatile'
-export const DEFAULT_AI_TIMEOUT = 8000
-export const DEFAULT_AI_TEMPERATURE = 0.2
 
 export const COUNTRIES_ENDPOINT = '/countries'
 
 export const NUMBER_PATTERN = /^\d+$/
 export const PHONE_PATTERN = /^\+?\d[\d\s-]{7,}$/
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+export const NATIONAL_ID_PLACEHOLDER = '123456789'
+
+export const FORM_VALIDATION_MODE = 'onBlur' as const
+export const FORM_REVALIDATE_MODE = 'onChange' as const
+export const STATE_SYNC_DELAY_MS = 25
+export const TOAST_AUTO_CLOSE_MS = 4000
+export const DEFAULT_ERROR_MESSAGE = 'An unexpected network error occurred. Please try again.'
 
 export const ASYNC_STATUS = {
   idle: 'idle',

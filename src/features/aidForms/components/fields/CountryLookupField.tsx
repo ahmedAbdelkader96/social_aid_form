@@ -77,6 +77,17 @@ export const CountryLookupField: FC<CountryLookupFieldProps> = ({
   }
 
   const validateCountryBlur = async () => {
+    const q = (countryQuery || '').trim()
+    if (q) {
+      const matched = options.find((entry) => getLocaleName(entry).toLowerCase() === q.toLowerCase())
+      if (matched) {
+        selectCountry(matched)
+      } else {
+        setValue(AID_FORM_FIELD.countryCode, '', { shouldValidate: true, shouldDirty: true })
+        if (clearErrors) clearErrors(AID_FORM_FIELD.countryCode)
+      }
+    }
+
     if (trigger) await trigger(AID_FORM_FIELD.countryCode)
   }
 

@@ -100,5 +100,48 @@ export function savePersistedState(state: PersistedState): void {
   }
 }
 
+// Clear only the persisted aidForm.form in localStorage while keeping countries.
+export function clearPersistedForm(): void {
+  if (typeof window === 'undefined') return
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY)
+    if (!raw) return
+    const parsedRaw = JSON.parse(raw) as unknown
+    if (parsedRaw === null || typeof parsedRaw !== 'object') return
+    const persisted = parsedRaw as Partial<PersistedState>
+    const countriesToKeep: CountriesState =
+      persisted.countries ?? {
+        items: [],
+        locale: AID_FORM_LANGUAGE.en,
+        status: 'idle',
+        error: null,
+        lastFetchedAt: null,
+      }
+
+    const sanitized: PersistedState = {
+      aidForm: {
+        currentStep: AID_FORM_STEP.step1,
+        language: AID_FORM_LANGUAGE.en,
+        form: defaultAidForm,
+        submitStatus: AID_FORM_SUBMIT_STATUS.idle,
+        submitError: null,
+      },
+      countries: countriesToKeep,
+    }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized))
+  } catch {
+    // ignore
+  }
+}
+
+export function clearPersistedState(): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // ignore
+  }
+}
+
 
 

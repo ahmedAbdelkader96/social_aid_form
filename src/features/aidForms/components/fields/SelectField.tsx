@@ -1,5 +1,5 @@
-import type { FC } from 'react'
-import type { UseFormRegister } from 'react-hook-form'
+import type { ChangeEvent, FC } from 'react'
+import type { UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import type { Option } from '../../../../shared/ui/SelectMenu'
 import SelectMenu from '../../../../shared/ui/SelectMenu'
 import type { AidFormValues } from '../../types/aidFormTypes'
@@ -16,6 +16,7 @@ interface SelectFieldProps extends FormFieldProps {
   delayIndex: number
   className?: string
   registerOptions?: Parameters<UseFormRegister<AidFormValues>>[1]
+  setValue?: UseFormSetValue<AidFormValues>
 }
 
 export const SelectField: FC<SelectFieldProps> = ({
@@ -28,6 +29,7 @@ export const SelectField: FC<SelectFieldProps> = ({
   trigger,
   clearErrors,
   dismissToast,
+  setValue,
   delayIndex,
   className,
   registerOptions,
@@ -40,6 +42,19 @@ export const SelectField: FC<SelectFieldProps> = ({
     dismissToast ?? undefined,
   )
 
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    if (typeof reg.onChange === 'function') reg.onChange(event)
+    if (setValue) {
+      setValue(field, event.target.value as any, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: false,
+      })
+    }
+    if (clearErrors) clearErrors(field)
+    if (dismissToast) dismissToast()
+  }
+
   return (
     <FieldWrapper label={label} delayIndex={delayIndex}>
       <SelectMenu
@@ -47,6 +62,7 @@ export const SelectField: FC<SelectFieldProps> = ({
         options={[{ value: '', label: placeholder }, ...options]}
         className={className ?? styles.fieldInput}
         aria-invalid={!!errors[field]}
+        onChange={handleChange}
       />
     </FieldWrapper>
   )

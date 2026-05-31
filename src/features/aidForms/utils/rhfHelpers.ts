@@ -7,7 +7,7 @@ type RegisterOnBlurEvent = Parameters<NonNullable<UseFormRegisterReturn['onBlur'
 export function enhanceRegisterEvent(
   reg: UseFormRegisterReturn,
   field: keyof AidFormValues,
-  trigger?: UseFormTrigger<AidFormValues>,
+  _trigger?: UseFormTrigger<AidFormValues>,
   clearErrors?: UseFormClearErrors<AidFormValues>,
   dismissToast?: () => void,
 ) {
@@ -18,9 +18,9 @@ export function enhanceRegisterEvent(
       if (clearErrors) clearErrors(field)
       if (dismissToast) dismissToast()
     },
-    onBlur: async (event: RegisterOnBlurEvent) => {
-      if (typeof reg.onBlur === 'function') await reg.onBlur(event)
-      if (trigger) await trigger(field)
+    onBlur: (event: RegisterOnBlurEvent) => {
+      if (typeof reg.onBlur === 'function') reg.onBlur(event)
     },
   }
 }
+

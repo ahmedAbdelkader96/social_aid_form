@@ -3,6 +3,7 @@
  * Centralizes HTTP settings and keeps network plumbing out of components.
  */
 import axios from 'axios'
+import { normalizeAxiosError } from '../errors'
 
 const defaultHeaders = {
   'Content-Type': 'application/json',
@@ -14,3 +15,8 @@ export const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: defaultHeaders,
 })
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(new Error(normalizeAxiosError(error).message)),
+)

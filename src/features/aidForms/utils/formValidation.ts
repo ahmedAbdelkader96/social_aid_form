@@ -62,6 +62,12 @@ export function validateFields(values: AidFormValues, fields: ReadonlyArray<AidF
   const errors: Record<string, string> = {}
   let firstField: AidFormField | null = null
 
+  console.debug('validateFields input', {
+    nameValue: values.name,
+    allValues: values,
+    fieldCount: fields.length,
+  })
+
   for (const field of fields) {
     const value = values[field]
     const err = getFieldValidationError(field, value, t)
@@ -70,6 +76,12 @@ export function validateFields(values: AidFormValues, fields: ReadonlyArray<AidF
       if (!firstField) firstField = field
     }
   }
+
+  console.debug('validateFields output', {
+    firstField,
+    nameError: errors.name,
+    allErrors: errors,
+  })
 
   return { valid: Object.keys(errors).length === 0, errors, firstField }
 }
@@ -80,10 +92,19 @@ export function getFirstErrorMessage(
   errors: FieldErrors<AidFormValues> = {},
   t: TFunction,
 ) {
+  console.debug('getFirstErrorMessage input', {
+    nameValue: values.name,
+    nameRhfError: errors.name,
+  })
+
   // Validate all fields based on actual values to find the first truly invalid field
   // This ensures we show the correct error even if RHF errors object has stale data
   const { firstField, errors: validationErrors } = validateFields(values, fields, t)
   if (firstField) {
+    console.debug('getFirstErrorMessage result', {
+      message: validationErrors[firstField],
+      fromValidateFields: true,
+    })
     return validationErrors[firstField]
   }
 
@@ -93,6 +114,10 @@ export function getFirstErrorMessage(
     const error = errors[field]
     if (error) {
       if (typeof error.message === 'string' && error.message.trim() !== '') {
+        console.debug('getFirstErrorMessage result', {
+          message: error.message,
+          fromRhfError: true,
+        })
         return error.message
       }
     }

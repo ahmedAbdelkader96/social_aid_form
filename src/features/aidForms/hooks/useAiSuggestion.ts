@@ -36,7 +36,7 @@ export function useAiSuggestion({ getValues, setValue, t }: UseAiSuggestionParam
 
       try {
         const values = getValues()
-        const suggestion = await generateAISuggestion(field, values as unknown)
+        const suggestion = await generateAISuggestion(field, values)
         setHelpText(suggestion)
       } catch (error) {
         setHelpError(error instanceof Error ? error.message : t('suggestionError'))

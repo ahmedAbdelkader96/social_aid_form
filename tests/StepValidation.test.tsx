@@ -318,6 +318,20 @@ test('Real Step1 component validation shows nationalId when name is filled', asy
   })
 })
 
+test('Real Step1 component validation requires all fields before advancing', async () => {
+  render(<TestStep1WithRealStep />)
+
+  const phoneInput = screen.getByPlaceholderText('123 456 7890') as HTMLInputElement
+  const nextButton = screen.getByRole('button', { name: /next/i })
+
+  fireEvent.change(phoneInput, { target: { value: '1234567890' } })
+  fireEvent.click(nextButton)
+
+  await waitFor(() => {
+    expect(screen.getByRole('status')).toHaveTextContent('Name is required.')
+  })
+})
+
 test('Full AidForm integration logs values and errors on Next', async () => {
   const debug = vi.spyOn(console, 'debug').mockImplementation(() => {})
   render(<TestAidFormFull />)
