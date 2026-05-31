@@ -1,0 +1,93 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.56);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(8px);
+  padding: 24px;
+  z-index: 50;
+}
+
+.modalContent {
+  width: min(720px, 100%);
+  background: #ffffff;
+  border-radius: 26px;
+  box-shadow: 0 34px 80px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #111827;
+}
+
+.modalClose {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 24px;
+}
+
+.modalTextarea {
+  width: 100%;
+  min-height: 260px;
+  border-radius: 20px;
+  border: 1px solid #d1d5db;
+  padding: 18px 20px;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 24px 24px;
+}
+
+.acceptButton,
+.discardButton {
+  min-height: 48px;
+  border-radius: 16px;
+  border: none;
+  padding: 0 22px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.discardButton {
+  color: #374151;
+  background: #f8fafc;
+}
+
+.acceptButton {
+  color: #ffffff;
+  background: linear-gradient(90deg, #6366f1, #2563eb);
+}
+
+.errorMessage {
+  color: #b91c1c;
+  font-size: 0.95rem;
+}
