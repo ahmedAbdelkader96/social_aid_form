@@ -1,29 +1,18 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import type { FC, ChangeEvent } from 'react'
-import type {
-  FieldErrors,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-  UseFormClearErrors,
-  UseFormTrigger,
-} from 'react-hook-form'
 import type CountryModel from '../../../countries/models/CountryModel'
 import DialCodeOptionList from '../../../countries/components/DialCodeOptionList'
 import { FieldWrapper } from './FieldWrapper'
-import type { AidFormValues } from '../../types/aidFormTypes'
+import { enhanceRegisterEvent } from '../../utils/rhfHelpers'
+import type { Step1FieldProps } from '../../types/formFieldTypes'
 import { AID_FORM_FIELD } from '../../types/aidFormTypes'
 import { PHONE_PATTERN } from '../../../../shared/constants'
+import { getCountryLocale, getCountryLocaleName } from '../../../countries/utils/countryLocale'
 import styles from '../../styles/AidForm.module.css'
 
-interface PhoneDialFieldProps {
-  register: UseFormRegister<AidFormValues>
-  getValues: UseFormGetValues<AidFormValues>
-  setValue: UseFormSetValue<AidFormValues>
-  trigger?: UseFormTrigger<AidFormValues>
-  errors: FieldErrors<AidFormValues>
-  clearErrors?: UseFormClearErrors<AidFormValues>
+interface PhoneDialFieldProps extends Step1FieldProps {
   options: CountryModel[]
   loading: boolean
   delayIndex: number
@@ -31,37 +20,32 @@ interface PhoneDialFieldProps {
 
 export const PhoneDialField: FC<PhoneDialFieldProps> = ({
   register,
-  getValues,
+  control,
   setValue,
   trigger,
   errors,
   clearErrors,
+  dismissToast,
   options,
   loading,
   delayIndex,
 }) => {
   const { t, i18n } = useTranslation()
-  const locale = i18n.language.startsWith('ar') ? 'ar' : 'en'
+  const locale = useMemo(() => getCountryLocale(i18n.language), [i18n.language])
   const getLocaleName = useCallback(
-    (entry: CountryModel | null | undefined) => {
-      if (!entry) return ''
-      return locale === 'ar' ? entry.nameAr || entry.nameEn || entry.code : entry.nameEn || entry.nameAr || entry.code
-    },
+    (entry: CountryModel | null | undefined) => getCountryLocaleName(entry, locale),
     [locale],
   )
 
   const [dialQuery, setDialQuery] = useState('')
   const [dialOpen, setDialOpen] = useState(false)
-  const [selectedDial, setSelectedDial] = useState<CountryModel | null>(null)
   const dialRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const values = getValues()
-    if (values.dialCode && options.length > 0) {
-      const found = options.find((entry) => entry.dialCode === values.dialCode)
-      if (found) setSelectedDial(found)
-    }
-  }, [getValues, options])
+  const dialCode = useWatch({ control, name: AID_FORM_FIELD.dialCode })
+  const selectedDial = useMemo(() => {
+    if (!dialCode || options.length === 0) return null
+    return options.find((entry) => entry.dialCode === dialCode) ?? null
+  }, [dialCode, options])
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -85,30 +69,37 @@ export const PhoneDialField: FC<PhoneDialFieldProps> = ({
         (entry.code && entry.code.toLowerCase().includes(lq))
       )
     })
-  }, [dialQuery, options])
+  }, [dialQuery, options, getLocaleName])
 
   const validateDialBlur = async () => {
     if (trigger) await trigger(AID_FORM_FIELD.dialCode)
   }
 
   const selectDialCode = (entry: CountryModel) => {
-    setSelectedDial(entry)
     setValue(AID_FORM_FIELD.dialCode, entry.dialCode, { shouldValidate: true, shouldDirty: true })
     if (clearErrors) clearErrors(AID_FORM_FIELD.dialCode)
     setDialOpen(false)
   }
 
-  const phoneError =
-    errors.phone?.message || (errors.phone || errors.dialCode ? t('fieldRequired', { field: t('phone') }) : undefined)
+  const phoneReg = enhanceRegisterEvent(
+    register(AID_FORM_FIELD.phone, {
+      required: true,
+      pattern: { value: PHONE_PATTERN, message: t('invalidPhone') },
+    }),
+    AID_FORM_FIELD.phone,
+    trigger,
+    clearErrors,
+    dismissToast ?? undefined,
+  )
 
   return (
-    <FieldWrapper label={t('phone')} delayIndex={delayIndex} error={phoneError}>
+    <FieldWrapper label={t('phone')} delayIndex={delayIndex}>
       <div className={styles.phoneInputGroup}>
         <div className={styles.dialPicker} ref={dialRef}>
           <button
             type="button"
             className={styles.dialButton}
-            onClick={() => setDialOpen((open) => !open)}
+            onClick={() => setDialOpen((open: boolean) => !open)}
             aria-expanded={dialOpen}
             disabled={loading}
           >
@@ -122,7 +113,16 @@ export const PhoneDialField: FC<PhoneDialFieldProps> = ({
             </div>
           </button>
 
-          <input type="hidden" {...register(AID_FORM_FIELD.dialCode)} />
+          <input
+            type="hidden"
+            {...enhanceRegisterEvent(
+              register(AID_FORM_FIELD.dialCode, { required: true }),
+              AID_FORM_FIELD.dialCode,
+              trigger,
+              clearErrors,
+              dismissToast ?? undefined,
+            )}
+          />
 
           {dialOpen && (
             <div className={styles.dialDropdown}>
@@ -151,14 +151,7 @@ export const PhoneDialField: FC<PhoneDialFieldProps> = ({
         </div>
 
         <input
-          {...register(AID_FORM_FIELD.phone, {
-            required: true,
-            pattern: { value: PHONE_PATTERN, message: t('invalidPhone') },
-            onChange: () => clearErrors && clearErrors(AID_FORM_FIELD.phone),
-            onBlur: async () => {
-              if (trigger) await trigger(AID_FORM_FIELD.phone)
-            },
-          })}
+          {...phoneReg}
           className={styles.fieldInput}
           aria-invalid={!!errors.phone || !!errors.dialCode}
           placeholder="123 456 7890"

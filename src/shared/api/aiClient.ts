@@ -67,7 +67,7 @@ export async function generateAISuggestion(
     const res = await fetch(AI_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'aidForm/json',
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${AI_API_KEY}`,
       },
       body: JSON.stringify(body),

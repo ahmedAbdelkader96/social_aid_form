@@ -1,11 +1,11 @@
 /**
- * aidForm controller layer responsible for orchestrating submission logic.
+ * aidForm service layer responsible for orchestrating submission logic.
  * Keeps feature validation and payload transformation outside of UI components.
  */
 import type { AidFormValues } from '../types/aidFormTypes'
 import AidFormRepo from '../repo/AidFormRepo'
 
-class AidFormController {
+class AidFormService {
   private aidFormRepo: AidFormRepo
 
   constructor(aidFormRepo: AidFormRepo = new AidFormRepo()) {
@@ -18,5 +18,5 @@ class AidFormController {
   }
 }
 
-export default AidFormController
+export default AidFormService
 

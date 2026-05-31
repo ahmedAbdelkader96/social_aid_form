@@ -19,8 +19,8 @@ import { Step1 } from '../src/features/aidForms/components/Step1'
 import type { AidFormValues } from '../src/features/aidForms/types/aidFormTypes'
 
 function Wrapper() {
-  const { register, setValue, getValues } = useForm<AidFormValues>()
-  return <Step1 register={register} setValue={setValue} getValues={getValues} errors={{}} />
+  const { register, setValue, control } = useForm<AidFormValues>()
+  return <Step1 register={register} setValue={setValue} control={control} errors={{}} />
 }
 
 test('typing opens suggestions and selecting country updates input', async () => {

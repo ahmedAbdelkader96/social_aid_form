@@ -60,6 +60,7 @@ const ar = {
   noCountries: 'لم يتم العثور على دول',
   noMatches: 'لا توجد نتائج',
   invalidEmail: 'أدخل بريدًا إلكترونيًا صالحًا.',
+  pleaseFixErrors: 'يرجى تصحيح الأخطاء في النموذج.',
   languageLabel: 'اللغة',
   english: 'الإنجليزية',
   arabic: 'العربية',

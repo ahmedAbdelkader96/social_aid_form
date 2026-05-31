@@ -1,32 +1,15 @@
 // Second form step for family, employment, and financial details.
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { FieldErrors, UseFormRegister, UseFormClearErrors, UseFormTrigger } from 'react-hook-form'
-import type { AidFormValues } from '../types/aidFormTypes'
 import { AID_FORM_FIELD } from '../types/aidFormTypes'
-import { FieldWrapper } from './fields/FieldWrapper'
+import { TextField } from './fields/TextField'
 import { SelectField } from './fields/SelectField'
-import { showToast } from '../../../shared/services/toastService'
 import { getMaritalStatusOptions, getEmploymentStatusOptions, getHousingStatusOptions } from '../utils/aidFormSelectOptions'
+import type { FormFieldProps } from '../types/formFieldTypes'
 import styles from '../styles/AidForm.module.css'
 
- interface Step2Props {
-  register: UseFormRegister<AidFormValues>
-  trigger?: UseFormTrigger<AidFormValues>
-  errors: FieldErrors<AidFormValues>
-  clearErrors?: UseFormClearErrors<AidFormValues>
- }
-
-export const Step2: FC<Step2Props> = ({ register, trigger, errors, clearErrors }) => {
+export const FamilyFinancialStep: FC<FormFieldProps> = ({ register, trigger, errors, clearErrors, dismissToast }) => {
   const { t } = useTranslation()
-
-  const validateFieldOnBlur = async (field: keyof AidFormValues, value: string) => {
-    if (trigger) await trigger(field)
-
-    if (!String(value ?? '').trim()) {
-      showToast(t('fieldRequired', { field: t(field) }), 'error')
-    }
-  }
 
   return (
     <div className={styles.stepGrid}>
@@ -39,29 +22,23 @@ export const Step2: FC<Step2Props> = ({ register, trigger, errors, clearErrors }
         trigger={trigger}
         errors={errors}
         clearErrors={clearErrors}
+        dismissToast={dismissToast}
         delayIndex={0}
       />
 
-      <FieldWrapper
-        delayIndex={1}
+      <TextField
+        field={AID_FORM_FIELD.dependents}
+        type="number"
         label={t('dependents')}
-        error={errors.dependents ? t('fieldRequired', { field: t('dependents') }) : undefined}
-      >
-        <input
-          type="number"
-          min="0"
-          {...register(AID_FORM_FIELD.dependents, {
-            required: true,
-            valueAsNumber: true,
-            onChange: () => clearErrors && clearErrors(AID_FORM_FIELD.dependents),
-            onBlur: async (event) => {
-              await validateFieldOnBlur(AID_FORM_FIELD.dependents, event.target.value)
-            },
-          })}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.dependents}
-        />
-      </FieldWrapper>
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        dismissToast={dismissToast}
+        delayIndex={1}
+        min="0"
+        registerOptions={{ valueAsNumber: true }}
+      />
 
       <SelectField
         field={AID_FORM_FIELD.employmentStatus}
@@ -72,30 +49,24 @@ export const Step2: FC<Step2Props> = ({ register, trigger, errors, clearErrors }
         trigger={trigger}
         errors={errors}
         clearErrors={clearErrors}
+        dismissToast={dismissToast}
         delayIndex={2}
       />
 
-      <FieldWrapper
-        delayIndex={3}
+      <TextField
+        field={AID_FORM_FIELD.monthlyIncome}
+        type="number"
         label={t('monthlyIncome')}
-        error={errors.monthlyIncome ? t('fieldRequired', { field: t('monthlyIncome') }) : undefined}
-      >
-        <input
-          type="number"
-          min="0"
-          step="0.01"
-          {...register(AID_FORM_FIELD.monthlyIncome, {
-            required: true,
-            valueAsNumber: true,
-            onChange: () => clearErrors && clearErrors(AID_FORM_FIELD.monthlyIncome),
-            onBlur: async (event) => {
-              await validateFieldOnBlur(AID_FORM_FIELD.monthlyIncome, event.target.value)
-            },
-          })}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.monthlyIncome}
-        />
-      </FieldWrapper>
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        dismissToast={dismissToast}
+        delayIndex={3}
+        min="0"
+        step="0.01"
+        registerOptions={{ valueAsNumber: true }}
+      />
 
       <SelectField
         field={AID_FORM_FIELD.housingStatus}
@@ -106,10 +77,13 @@ export const Step2: FC<Step2Props> = ({ register, trigger, errors, clearErrors }
         trigger={trigger}
         errors={errors}
         clearErrors={clearErrors}
+        dismissToast={dismissToast}
         delayIndex={4}
       />
     </div>
   )
 }
+
+export const Step2 = FamilyFinancialStep
 
 

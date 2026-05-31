@@ -3,9 +3,9 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { AidFormState, AidFormValues, AidFormLanguage } from '../types/aidFormTypes'
 import { AID_FORM_STEP, AID_FORM_SUBMIT_STATUS, defaultAidForm } from '../types/aidFormTypes'
-import AidFormController from '../controller/AidFormController'
+import AidFormService from '../services/AidFormService'
 
-const aidFormController = new AidFormController()
+const aidFormService = new AidFormService()
 
 const initialState: AidFormState = {
   currentStep: AID_FORM_STEP.step1,
@@ -21,7 +21,7 @@ export const submitAidFormAsync = createAsyncThunk<
   { rejectValue: string }
 >('aidForm/submit', async (values, { rejectWithValue }) => {
   try {
-    const success = await aidFormController.submitAidForm(values)
+    const success = await aidFormService.submitAidForm(values)
     if (!success) {
       return rejectWithValue('aidForm submission failed.')
     }

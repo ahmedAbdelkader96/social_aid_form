@@ -1,7 +1,7 @@
 // Countries feature Redux slice for loading and storing normalized country lookup data.
 // Keeps remote country loading separate from form presentation logic.
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import CountriesController from '../controller/CountriesController'
+import CountriesService from '../services/CountriesService'
 import CountryModel from '../models/CountryModel'
 import { AID_FORM_LANGUAGE } from '../../aidForms/types/aidFormTypes'
 import { ASYNC_STATUS, type AsyncStatus } from '../../../shared/constants'
@@ -33,8 +33,8 @@ export const fetchCountriesAsync = createAsyncThunk<
   }
 
   try {
-    const controller = new CountriesController()
-    return await controller.fetchCountries()
+    const countriesService = new CountriesService()
+    return await countriesService.fetchCountries()
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error ?? 'Failed to load countries.')
     return rejectWithValue(message)

@@ -1,7 +1,7 @@
 // LocalStorage persistence helper for aidForm state.
 // This module safely loads and saves the Redux state between sessions.
 import type { AidFormState } from '../../features/aidForms/types/aidFormTypes'
-import { AID_FORM_SUBMIT_STATUS } from '../../features/aidForms/types/aidFormTypes'
+import { AID_FORM_SUBMIT_STATUS, AID_FORM_STEP, AID_FORM_LANGUAGE, defaultAidForm } from '../../features/aidForms/types/aidFormTypes'
 import type { CountriesState } from '../../features/countries/stores/countriesSlice'
 import { STORAGE_KEY } from '../constants'
 
@@ -26,7 +26,9 @@ export function loadPersistedState(): PersistedState | undefined {
       return undefined
     }
 
-    const persisted = parsed as PersistedState
+    const persisted = parsed as unknown as Partial<PersistedState>
+    const persistedAidForm = persisted.aidForm as Partial<AidFormState> | undefined
+    const persistedForm = persistedAidForm?.form as Partial<AidFormState['form']> | undefined
 
     // Sanitize suspicious persisted fields that may come from autofill or stale data.
     const sanitizeValue = (val: unknown) => {
@@ -43,22 +45,30 @@ export function loadPersistedState(): PersistedState | undefined {
       return ''
     }
 
-    const sanitizedAidForm = {
-      ...persisted.aidForm,
+    const sanitizedAidForm: AidFormState = {
+      currentStep: persistedAidForm?.currentStep ?? AID_FORM_STEP.step1,
+      language: persistedAidForm?.language ?? AID_FORM_LANGUAGE.en,
       form: {
-        ...((persisted.aidForm && (persisted.aidForm as any).form) || {}),
-        nationalId: sanitizeValue((persisted.aidForm as any)?.form?.nationalId),
-        phone: sanitizeValue((persisted.aidForm as any)?.form?.phone),
+        ...defaultAidForm,
+        ...(persistedForm ?? {}),
+        nationalId: sanitizeValue(persistedForm?.nationalId),
+        phone: sanitizeValue(persistedForm?.phone),
       },
+      submitStatus: AID_FORM_SUBMIT_STATUS.idle,
+      submitError: null,
+    }
+
+    const defaultCountries: CountriesState = {
+      items: [],
+      locale: AID_FORM_LANGUAGE.en,
+      status: 'idle',
+      error: null,
+      lastFetchedAt: null,
     }
 
     return {
-      ...persisted,
-      aidForm: {
-        ...sanitizedAidForm,
-        submitStatus: AID_FORM_SUBMIT_STATUS.idle,
-        submitError: null,
-      },
+      aidForm: sanitizedAidForm,
+      countries: persisted.countries ?? defaultCountries,
     }
   } catch {
     return undefined

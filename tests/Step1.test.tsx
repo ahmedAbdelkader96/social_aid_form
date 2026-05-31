@@ -26,8 +26,8 @@ vi.mock('react-i18next', () => ({
 }))
 
 function Wrapper() {
-  const { register, setValue, getValues } = useForm<AidFormValues>()
-  return <Step1 register={register} setValue={setValue} getValues={getValues} errors={{}} />
+  const { register, setValue, control } = useForm<AidFormValues>()
+  return <Step1 register={register} setValue={setValue} control={control} errors={{}} />
 }
 
 test('renders Step1 fields and can open country list', async () => {

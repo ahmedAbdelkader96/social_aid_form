@@ -9,9 +9,9 @@ vi.mock('react-i18next', () => ({
 // Mock framer-motion to render elements synchronously in tests
 import React from 'react'
 vi.mock('framer-motion', () => ({
-	motion: {
-		div: (props: any) => React.createElement('div', props),
-		label: (props: any) => React.createElement('label', props),
-	},
-	AnimatePresence: (props: any) => React.createElement(React.Fragment, props),
+  motion: {
+    div: (props: React.HTMLAttributes<HTMLDivElement>) => React.createElement('div', props),
+    label: (props: React.LabelHTMLAttributes<HTMLLabelElement>) => React.createElement('label', props),
+  },
+  AnimatePresence: (props: React.PropsWithChildren<Record<string, unknown>>) => React.createElement(React.Fragment, props),
 }))

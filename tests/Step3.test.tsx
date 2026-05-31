@@ -52,11 +52,12 @@ test('loadingField disables corresponding button and shows loading text', () => 
   expect(buttons[1]).toHaveTextContent('loading')
 })
 
-test('shows required error when present in errors prop', () => {
+test('marks textarea invalid when errors are present', () => {
   const errors = { financialSituation: { type: 'required' } }
   render(<Wrapper errors={errors as Parameters<typeof Step3>[0]['errors']} />)
 
-  expect(screen.getByText('fieldRequired')).toBeInTheDocument()
+  const textarea = screen.getByLabelText(/currentFinancialSituation/i)
+  expect(textarea).toHaveAttribute('aria-invalid', 'true')
 })
 
 

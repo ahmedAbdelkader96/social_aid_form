@@ -1,35 +1,45 @@
-import type { AidFormField, HelpField } from '../types/aidFormTypes'
+import type { AidFormField, HelpField, AidFormValues } from '../types/aidFormTypes'
+import type { FieldErrors } from 'react-hook-form'
 import type { TFunction } from 'i18next'
 import { AID_FORM_FIELD } from '../types/aidFormTypes'
 import { EMAIL_PATTERN, PHONE_PATTERN, NUMBER_PATTERN } from '../../../shared/constants'
 
-export const isEmptyValue = (value: unknown) => String(value ?? '').trim() === ''
+export const isEmptyValue = (value: unknown): boolean => {
+  // Handle null and undefined
+  if (value === null || value === undefined) return true
+  
+  // Handle numbers - only 0 and NaN are considered empty for non-numeric fields
+  if (typeof value === 'number') {
+    return isNaN(value)
+  }
+  
+  // Handle strings and everything else
+  return String(value).trim() === ''
+}
 
 export const getFieldValidationError = (
   field: AidFormField,
   value: unknown,
   t: TFunction,
 ): string | null => {
-  const trimmed = String(value ?? '').trim()
-
-  if (!trimmed) {
-    // Use a friendly label for country-related fields.
+  // First check: is the field empty?
+  if (isEmptyValue(value)) {
+    // Use a friendly label for country-related fields
     if (field === AID_FORM_FIELD.countryCode) {
       return t('fieldRequired', { field: t('country') })
     }
     return t('fieldRequired', { field: t(field) })
   }
 
+  // Second check: validate specific patterns
+  const trimmed = String(value).trim()
+
   if (field === AID_FORM_FIELD.nationalId && !NUMBER_PATTERN.test(trimmed)) {
     return t('invalidNationalId')
   }
 
-  if (field === AID_FORM_FIELD.phone) {
-    // Phone number is validated by pattern only. Dial code (country phone) is optional
-    // because the selected `country` may be different from the phone's dial code.
-    if (!PHONE_PATTERN.test(trimmed)) {
-      return t('invalidPhone')
-    }
+  if (field === AID_FORM_FIELD.phone && !PHONE_PATTERN.test(trimmed)) {
+    return t('invalidPhone')
   }
 
   if (field === AID_FORM_FIELD.email && !EMAIL_PATTERN.test(trimmed)) {
@@ -40,28 +50,53 @@ export const getFieldValidationError = (
 }
 
 export const getHelpFieldValidationError = (field: HelpField, value: unknown, t: TFunction): string | null => {
-  const trimmed = String(value ?? '').trim()
-  if (!trimmed) {
+  if (isEmptyValue(value)) {
     return t('fieldRequired', { field: t(field) })
   }
   return null
 }
 
 // Batch validator returning first error and map of errors for a set of fields
-import type { AidFormValues } from '../types/aidFormTypes'
 
-export function validateFields(values: AidFormValues, fields: ReadonlyArray<keyof AidFormValues>, t: TFunction) {
+export function validateFields(values: AidFormValues, fields: ReadonlyArray<AidFormField>, t: TFunction) {
   const errors: Record<string, string> = {}
-  let firstField: keyof AidFormValues | null = null
+  let firstField: AidFormField | null = null
 
   for (const field of fields) {
-    const value = values[field as keyof AidFormValues]
-    const err = getFieldValidationError(field as any, value, t)
+    const value = values[field]
+    const err = getFieldValidationError(field, value, t)
     if (err) {
-      errors[field as string] = err
+      errors[field] = err
       if (!firstField) firstField = field
     }
   }
 
   return { valid: Object.keys(errors).length === 0, errors, firstField }
+}
+
+export function getFirstErrorMessage(
+  values: AidFormValues,
+  fields: ReadonlyArray<AidFormField>,
+  errors: FieldErrors<AidFormValues> = {},
+  t: TFunction,
+) {
+  // Validate all fields based on actual values to find the first truly invalid field
+  // This ensures we show the correct error even if RHF errors object has stale data
+  const { firstField, errors: validationErrors } = validateFields(values, fields, t)
+  if (firstField) {
+    return validationErrors[firstField]
+  }
+
+  // If no validation errors based on values, fall back to checking RHF errors
+  // (for custom validation messages like invalidNationalId, invalidEmail, etc.)
+  for (const field of fields) {
+    const error = errors[field]
+    if (error) {
+      if (typeof error.message === 'string' && error.message.trim() !== '') {
+        return error.message
+      }
+    }
+  }
+
+  return t('pleaseFixErrors')
 }

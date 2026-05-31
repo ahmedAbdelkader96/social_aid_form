@@ -1,11 +1,10 @@
-// Navigation controls for moving between aidForm form steps.
 import { useTranslation } from 'react-i18next'
 import type { FC } from 'react'
 import { AID_FORM_STEP } from '../types/aidFormTypes'
 import type { AidFormStep } from '../types/aidFormTypes'
 import styles from '../styles/AidForm.module.css'
 
-interface StepNavigationProps {
+interface FormNavigationProps {
   currentStep: AidFormStep
   canGoBack: boolean
   isSubmitting: boolean
@@ -14,7 +13,7 @@ interface StepNavigationProps {
   onSubmit: () => void
 }
 
-export const StepNavigation: FC<StepNavigationProps> = ({
+export const FormNavigation: FC<FormNavigationProps> = ({
   currentStep,
   canGoBack,
   isSubmitting,
@@ -45,5 +44,3 @@ export const StepNavigation: FC<StepNavigationProps> = ({
     </div>
   )
 }
-
-

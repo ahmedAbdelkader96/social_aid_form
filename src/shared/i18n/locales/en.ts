@@ -60,6 +60,7 @@ const en = {
   noCountries: 'No countries found',
   noMatches: 'No matches found',
   invalidEmail: 'Enter a valid email address.',
+  pleaseFixErrors: 'Please fix the errors in the form.',
   languageLabel: 'Language',
   english: 'English',
   arabic: 'Arabic',

@@ -1,11 +1,10 @@
-// Modal component for displaying and accepting AI-generated help suggestions.
+import { useEffect, useRef, type ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useEffect, useRef } from 'react'
 import type { FC } from 'react'
 
-import styles from '../styles/AIHelpModal.module.css'
+import styles from '../styles/SuggestionDialog.module.css'
 
-interface AIHelpModalProps {
+interface SuggestionDialogProps {
   visible: boolean
   title: string
   value: string
@@ -17,7 +16,7 @@ interface AIHelpModalProps {
   onChange: (value: string) => void
 }
 
-export const AIHelpModal: FC<AIHelpModalProps> = ({
+export const SuggestionDialog: FC<SuggestionDialogProps> = ({
   visible,
   title,
   value,
@@ -32,16 +31,15 @@ export const AIHelpModal: FC<AIHelpModalProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   useEffect(() => {
-    if (visible) {
-      const handleKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') onClose()
-      }
-      document.addEventListener('keydown', handleKey)
-      // focus textarea when modal opens
-      setTimeout(() => textareaRef.current?.focus(), 0)
-      return () => document.removeEventListener('keydown', handleKey)
+    if (!visible) return undefined
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
     }
-    return undefined
+
+    document.addEventListener('keydown', handleKey)
+    textareaRef.current?.focus()
+    return () => document.removeEventListener('keydown', handleKey)
   }, [visible, onClose])
 
   if (!visible) {
@@ -54,9 +52,8 @@ export const AIHelpModal: FC<AIHelpModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={title}
-      onClick={(e) => {
-        // close when clicking on overlay background
-        if (e.target === e.currentTarget) onClose()
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose()
       }}
     >
       <div className={styles.modalContent}>
@@ -72,7 +69,7 @@ export const AIHelpModal: FC<AIHelpModalProps> = ({
             ref={textareaRef}
             className={styles.modalTextarea}
             value={value}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onChange(event.target.value)}
             rows={10}
             aria-label={t('suggestions')}
             disabled={loading}
@@ -90,4 +87,3 @@ export const AIHelpModal: FC<AIHelpModalProps> = ({
     </div>
   )
 }
-

@@ -5,14 +5,12 @@ interface FieldWrapperProps {
   label: string
   delayIndex: number
   children: ReactNode
-  error?: string
   className?: string
 }
 
-export function FieldWrapper({ label, delayIndex, children }: FieldWrapperProps) {
-  // Inline error spans removed — errors are shown via toasts only.
+export function FieldWrapper({ label, delayIndex, children, className }: FieldWrapperProps) {
   return (
-    <AnimatedFieldLabel className={undefined} delayIndex={delayIndex}>
+    <AnimatedFieldLabel className={className} delayIndex={delayIndex}>
       {label}
       {children}
     </AnimatedFieldLabel>

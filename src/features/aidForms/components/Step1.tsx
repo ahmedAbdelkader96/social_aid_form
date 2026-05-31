@@ -1,103 +1,60 @@
-// First form step for personal details, country selection, and phone input.
-import { motion } from 'framer-motion'
-import { useEffect } from 'react'
+// Personal details step for name, contact, and address fields.
 import { useTranslation } from 'react-i18next'
 import type { FC } from 'react'
-import type {
-  FieldErrors,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-  UseFormClearErrors,
-  UseFormTrigger,
-} from 'react-hook-form'
-import type { AidFormValues } from '../types/aidFormTypes'
 import { AID_FORM_FIELD } from '../types/aidFormTypes'
-import { FieldWrapper } from './fields/FieldWrapper'
+import { TextField } from './fields/TextField'
 import { SelectField } from './fields/SelectField'
 import { CountryLookupField } from './fields/CountryLookupField'
 import { PhoneDialField } from './fields/PhoneDialField'
-import { fetchCountriesAsync } from '../../countries/stores'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import { EMAIL_PATTERN, NUMBER_PATTERN } from '../../../shared/constants'
 import { getGenderOptions } from '../utils/aidFormSelectOptions'
+import type { Step1FieldProps } from '../types/formFieldTypes'
+import { useCountries } from '../../countries/hooks/useCountries'
 // toast display intentionally handled at submit/next level
 import styles from '../styles/AidForm.module.css'
 
-interface Step1Props {
-  register: UseFormRegister<AidFormValues>
-  setValue: UseFormSetValue<AidFormValues>
-  getValues: UseFormGetValues<AidFormValues>
-  trigger?: UseFormTrigger<AidFormValues>
-  errors: FieldErrors<AidFormValues>
-  clearErrors?: UseFormClearErrors<AidFormValues>
-}
-
-export const Step1: FC<Step1Props> = ({ register, setValue, getValues, trigger, errors, clearErrors }) => {
+export const PersonalDetailsStep: FC<Step1FieldProps> = ({ register, control, setValue, trigger, errors, clearErrors, dismissToast }) => {
   const { t } = useTranslation()
-  const dispatch = useAppDispatch()
-  const countriesState = useAppSelector((state) => state.countries)
-
-  const countryOptions = countriesState.items
-  const loading = countriesState.status === 'loading'
-
-  useEffect(() => {
-    dispatch(fetchCountriesAsync())
-  }, [dispatch])
-
-  const validateFieldOnBlur = async (field: keyof AidFormValues) => {
-    // Only trigger field validation on blur. Do not show toast here.
-    if (trigger) await trigger(field)
-  }
-
-  type FieldRegisterOptions = Parameters<UseFormRegister<AidFormValues>>[1]
-
-  const registerField = (field: keyof AidFormValues, options?: FieldRegisterOptions) => {
-    const reg = register(field, { required: true, ...options })
-    // Wrap onBlur to call RHF's internal onBlur and then our field validation helper.
-    return {
-      ...reg,
-      onBlur: async (e: unknown) => {
-        try {
-          if (typeof (reg as any).onBlur === 'function') await (reg as any).onBlur(e)
-        } finally {
-          await validateFieldOnBlur(field)
-        }
-      },
-    }
-  }
+  const { countries: countryOptions, loading } = useCountries()
 
   return (
-    <motion.div className={styles.stepGrid}>
-      <FieldWrapper className={styles.fieldLabel} delayIndex={0} label={t('name')} error={errors.name ? t('fieldRequired', { field: t('name') }) : undefined}>
-        <input
-          {...registerField(AID_FORM_FIELD.name)}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.name}
-        />
-      </FieldWrapper>
+    <div className={styles.stepGrid}>
+      <TextField
+        field={AID_FORM_FIELD.name}
+        label={t('name')}
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        dismissToast={dismissToast}
+        delayIndex={0}
+      />
 
-      <FieldWrapper className={styles.fieldLabel} delayIndex={1} label={t('nationalId')} error={errors.nationalId ? t('invalidNationalId') : undefined}>
-        <input
-          {...registerField(AID_FORM_FIELD.nationalId, {
-            pattern: { value: NUMBER_PATTERN, message: t('invalidNationalId') },
-          })}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.nationalId}
-          inputMode="numeric"
-          placeholder="123456789"
-          autoComplete="off"
-        />
-      </FieldWrapper>
+      <TextField
+        field={AID_FORM_FIELD.nationalId}
+        type="text"
+        label={t('nationalId')}
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        dismissToast={dismissToast}
+        delayIndex={1}
+        inputMode="numeric"
+        placeholder="123456789"
+        registerOptions={{ pattern: { value: NUMBER_PATTERN, message: t('invalidNationalId') } }}
+      />
 
-      <FieldWrapper delayIndex={2} label={t('dateOfBirth')} error={errors.dateOfBirth ? t('fieldRequired', { field: t('dateOfBirth') }) : undefined}>
-        <input
-          type="date"
-          {...registerField(AID_FORM_FIELD.dateOfBirth)}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.dateOfBirth}
-        />
-      </FieldWrapper>
+      <TextField
+        field={AID_FORM_FIELD.dateOfBirth}
+        type="date"
+        label={t('dateOfBirth')}
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        delayIndex={2}
+      />
 
       <SelectField
         field={AID_FORM_FIELD.gender}
@@ -108,16 +65,18 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, trigger, 
         trigger={trigger}
         errors={errors}
         clearErrors={clearErrors}
+        dismissToast={dismissToast}
         delayIndex={3}
       />
 
       <PhoneDialField
         register={register}
-        getValues={getValues}
+        control={control}
         setValue={setValue}
         trigger={trigger}
         errors={errors}
         clearErrors={clearErrors}
+        dismissToast={dismissToast}
         options={countryOptions}
         loading={loading}
         delayIndex={4}
@@ -125,50 +84,64 @@ export const Step1: FC<Step1Props> = ({ register, setValue, getValues, trigger, 
 
       <CountryLookupField
         register={register}
-        getValues={getValues}
+        control={control}
         setValue={setValue}
         trigger={trigger}
         errors={errors}
         clearErrors={clearErrors}
+        dismissToast={dismissToast}
         options={countryOptions}
         loading={loading}
         delayIndex={5}
       />
 
-      <FieldWrapper delayIndex={6} label={t('address')} error={errors.address ? t('fieldRequired', { field: t('address') }) : undefined}>
-        <input
-          {...registerField(AID_FORM_FIELD.address)}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.address}
-        />
-      </FieldWrapper>
+      <TextField
+        field={AID_FORM_FIELD.address}
+        label={t('address')}
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        dismissToast={dismissToast}
+        delayIndex={6}
+      />
 
-      <FieldWrapper delayIndex={7} label={t('state')} error={errors.state ? t('fieldRequired', { field: t('state') }) : undefined}>
-        <input
-          {...registerField(AID_FORM_FIELD.state)}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.state}
-        />
-      </FieldWrapper>
+      <TextField
+        field={AID_FORM_FIELD.state}
+        label={t('state')}
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        dismissToast={dismissToast}
+        delayIndex={7}
+      />
 
-      <FieldWrapper delayIndex={8} label={t('city')} error={errors.city ? t('fieldRequired', { field: t('city') }) : undefined}>
-        <input
-          {...registerField(AID_FORM_FIELD.city)}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.city}
-        />
-      </FieldWrapper>
+      <TextField
+        field={AID_FORM_FIELD.city}
+        label={t('city')}
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        dismissToast={dismissToast}
+        delayIndex={8}
+      />
 
-      <FieldWrapper delayIndex={9} label={t('email')} error={errors.email ? t('fieldRequired', { field: t('email') }) : undefined}>
-        <input
-          type="email"
-          {...registerField(AID_FORM_FIELD.email, {
-            pattern: EMAIL_PATTERN,
-          })}
-          className={styles.fieldInput}
-          aria-invalid={!!errors.email}
-        />
-      </FieldWrapper>
-    </motion.div>
+      <TextField
+        field={AID_FORM_FIELD.email}
+        type="email"
+        label={t('email')}
+        register={register}
+        errors={errors}
+        trigger={trigger}
+        clearErrors={clearErrors}
+        dismissToast={dismissToast}
+        delayIndex={9}
+        registerOptions={{ pattern: { value: EMAIL_PATTERN, message: t('invalidEmail') } }}
+      />
+    </div>
   )
 }
+
+export const Step1 = PersonalDetailsStep

@@ -3,9 +3,11 @@ import userEvent from '@testing-library/user-event'
 import CountryOptionList from '../src/features/countries/components/CountryOptionList'
 import DialCodeOptionList from '../src/features/countries/components/DialCodeOptionList'
 
-const mockOptions = [
-  { code: 'AA', nameEn: 'A', nameAr: 'أ', dialCode: '+1', flagUrl: '' },
-  { code: 'BB', nameEn: 'B', nameAr: 'ب', dialCode: '+2', flagUrl: '' },
+import CountryModel from '../src/features/countries/models/CountryModel'
+
+const mockOptions: CountryModel[] = [
+  new CountryModel({ code: 'AA', nameEn: 'A', nameAr: 'أ', dialCode: '+1', flagUrl: '' }),
+  new CountryModel({ code: 'BB', nameEn: 'B', nameAr: 'ب', dialCode: '+2', flagUrl: '' }),
 ]
 
 test('CountryOptionList renders country names and calls onSelect', async () => {
@@ -13,7 +15,7 @@ test('CountryOptionList renders country names and calls onSelect', async () => {
   const handle = vi.fn()
   render(
     <CountryOptionList
-      options={mockOptions as any}
+      options={mockOptions}
       loading={false}
       noResultsText={'none'}
       ulClassName={''}
@@ -36,7 +38,7 @@ test('DialCodeOptionList renders dial codes and calls onSelect', async () => {
   const handle = vi.fn()
   render(
     <DialCodeOptionList
-      options={mockOptions as any}
+      options={mockOptions}
       loading={false}
       noResultsText={'none'}
       ulClassName={''}

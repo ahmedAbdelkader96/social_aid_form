@@ -1,34 +1,38 @@
 import type { FC } from 'react'
 import type { UseFormRegister } from 'react-hook-form'
-import type { Option } from '../../../../shared/ui/SelectMenu'
-import SelectMenu from '../../../../shared/ui/SelectMenu'
 import type { AidFormValues } from '../../types/aidFormTypes'
 import type { FormFieldProps } from '../../types/formFieldTypes'
 import { enhanceRegisterEvent } from '../../utils/rhfHelpers'
 import { FieldWrapper } from './FieldWrapper'
 import styles from '../../styles/AidForm.module.css'
 
-interface SelectFieldProps extends FormFieldProps {
+interface TextFieldProps extends FormFieldProps {
   field: keyof AidFormValues
   label: string
-  placeholder: string
-  options: Option[]
   delayIndex: number
+  type?: string
+  placeholder?: string
+  inputMode?: 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
+  min?: string
+  step?: string
   className?: string
   registerOptions?: Parameters<UseFormRegister<AidFormValues>>[1]
 }
 
-export const SelectField: FC<SelectFieldProps> = ({
+export const TextField: FC<TextFieldProps> = ({
   field,
   label,
-  placeholder,
-  options,
   register,
   errors,
   trigger,
   clearErrors,
   dismissToast,
   delayIndex,
+  type = 'text',
+  placeholder,
+  inputMode,
+  min,
+  step,
   className,
   registerOptions,
 }) => {
@@ -42,9 +46,13 @@ export const SelectField: FC<SelectFieldProps> = ({
 
   return (
     <FieldWrapper label={label} delayIndex={delayIndex}>
-      <SelectMenu
+      <input
         {...reg}
-        options={[{ value: '', label: placeholder }, ...options]}
+        type={type}
+        placeholder={placeholder}
+        inputMode={inputMode}
+        min={min}
+        step={step}
         className={className ?? styles.fieldInput}
         aria-invalid={!!errors[field]}
       />

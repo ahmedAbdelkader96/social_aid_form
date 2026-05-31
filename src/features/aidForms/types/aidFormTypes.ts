@@ -106,6 +106,14 @@ export const AID_FORM_STEP = {
 
 export type AidFormStep = (typeof AID_FORM_STEP)[keyof typeof AID_FORM_STEP]
 
+export const AID_FORM_STEP_TITLE = {
+  personalInformation: 'personalInformation',
+  familyFinancialInfo: 'familyFinancialInfo',
+  situationDescriptions: 'situationDescriptions',
+} as const
+
+export type AidFormStepTitle = (typeof AID_FORM_STEP_TITLE)[keyof typeof AID_FORM_STEP_TITLE]
+
 export const AID_FORM_SUBMIT_STATUS = {
   idle: 'idle',
   submitting: 'submitting',

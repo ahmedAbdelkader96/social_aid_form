@@ -1,21 +1,17 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useWatch } from 'react-hook-form'
 import type { FC, ChangeEvent } from 'react'
-import type { FieldErrors, UseFormGetValues, UseFormRegister, UseFormSetValue, UseFormClearErrors, UseFormTrigger } from 'react-hook-form'
 import type CountryModel from '../../../countries/models/CountryModel'
-import type { AidFormValues } from '../../types/aidFormTypes'
+import type { Step1FieldProps } from '../../types/formFieldTypes'
 import { AID_FORM_FIELD } from '../../types/aidFormTypes'
+import { enhanceRegisterEvent } from '../../utils/rhfHelpers'
 import CountryOptionList from '../../../countries/components/CountryOptionList'
+import { getCountryLocale, getCountryLocaleName } from '../../../countries/utils/countryLocale'
 import { FieldWrapper } from './FieldWrapper'
 import styles from '../../styles/AidForm.module.css'
 
-interface CountryLookupFieldProps {
-  register: UseFormRegister<AidFormValues>
-  getValues: UseFormGetValues<AidFormValues>
-  setValue: UseFormSetValue<AidFormValues>
-  trigger?: UseFormTrigger<AidFormValues>
-  errors: FieldErrors<AidFormValues>
-  clearErrors?: UseFormClearErrors<AidFormValues>
+interface CountryLookupFieldProps extends Step1FieldProps {
   options: CountryModel[]
   loading: boolean
   delayIndex: number
@@ -23,31 +19,34 @@ interface CountryLookupFieldProps {
 
 export const CountryLookupField: FC<CountryLookupFieldProps> = ({
   register,
-  getValues,
+  control,
   setValue,
   trigger,
   errors,
   clearErrors,
+  dismissToast,
   options,
   loading,
   delayIndex,
 }) => {
   const { t, i18n } = useTranslation()
-  const locale = i18n.language.startsWith('ar') ? 'ar' : 'en'
+  const locale = useMemo(() => getCountryLocale(i18n.language), [i18n.language])
   const getLocaleName = useCallback(
-    (entry: CountryModel | null | undefined) => {
-      if (!entry) return ''
-      return locale === 'ar' ? entry.nameAr || entry.nameEn || entry.code : entry.nameEn || entry.nameAr || entry.code
-    },
+    (entry: CountryModel | null | undefined) => getCountryLocaleName(entry, locale),
     [locale],
   )
 
   const [countryQuery, setCountryQuery] = useState('')
   const [countryOpen, setCountryOpen] = useState(false)
-  const [selectedCountry, setSelectedCountry] = useState<CountryModel | null>(null)
   const countryRef = useRef<HTMLDivElement>(null)
 
-  const filteredCountryOptions = useCallback(() => {
+  const countryCode = useWatch({ control, name: AID_FORM_FIELD.countryCode })
+  const selectedCountry = useMemo(() => {
+    if (!countryCode || options.length === 0) return null
+    return options.find((entry) => entry.code === countryCode) ?? null
+  }, [countryCode, options])
+
+  const filteredCountryOptions = useMemo(() => {
     const q = (countryQuery || '').trim().toLowerCase()
     if (!q) return options
     return options.filter((entry) => {
@@ -59,17 +58,6 @@ export const CountryLookupField: FC<CountryLookupFieldProps> = ({
       )
     })
   }, [countryQuery, options, getLocaleName])
-
-  useEffect(() => {
-    const values = getValues()
-    if (values.countryCode && options.length > 0) {
-      const found = options.find((entry) => entry.code === values.countryCode)
-      if (found) {
-        setSelectedCountry(found)
-        setCountryQuery(getLocaleName(found))
-      }
-    }
-  }, [getValues, getLocaleName, options])
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -86,9 +74,6 @@ export const CountryLookupField: FC<CountryLookupFieldProps> = ({
     setCountryOpen(true)
     setValue(AID_FORM_FIELD.countryCode, '', { shouldValidate: true, shouldDirty: true })
     if (clearErrors) clearErrors(AID_FORM_FIELD.countryCode)
-    if (selectedCountry && getLocaleName(selectedCountry) !== event.target.value) {
-      setSelectedCountry(null)
-    }
   }
 
   const validateCountryBlur = async () => {
@@ -97,16 +82,13 @@ export const CountryLookupField: FC<CountryLookupFieldProps> = ({
 
   const selectCountry = (entry: CountryModel) => {
     setCountryQuery(getLocaleName(entry))
-    setSelectedCountry(entry)
     setValue(AID_FORM_FIELD.countryCode, entry.code, { shouldValidate: true, shouldDirty: true })
     if (clearErrors) clearErrors(AID_FORM_FIELD.countryCode)
     setCountryOpen(false)
   }
 
-  const countryError = errors.countryCode ? t('fieldRequired', { field: t('country') }) : undefined
-
   return (
-    <FieldWrapper label={t('country')} delayIndex={delayIndex} error={countryError}>
+    <FieldWrapper label={t('country')} delayIndex={delayIndex}>
       <div className={styles.countryInputWrapper} ref={countryRef}>
         <input
           type="text"
@@ -125,11 +107,20 @@ export const CountryLookupField: FC<CountryLookupFieldProps> = ({
           <img src={selectedCountry.flagUrl} alt={getLocaleName(selectedCountry)} className={styles.selectedFlagImage} />
         )}
 
-        <input type="hidden" {...register(AID_FORM_FIELD.countryCode)} />
+        <input
+          type="hidden"
+          {...enhanceRegisterEvent(
+            register(AID_FORM_FIELD.countryCode, { required: true }),
+            AID_FORM_FIELD.countryCode,
+            trigger,
+            clearErrors,
+            dismissToast ?? undefined,
+          )}
+        />
 
         {countryOpen && (
           <CountryOptionList
-            options={filteredCountryOptions()}
+            options={filteredCountryOptions}
             loading={loading}
             noResultsText={t('noCountries')}
             ulClassName={styles.suggestionList}

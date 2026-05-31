@@ -20,9 +20,10 @@ test('renders Step2 fields and shows required error when provided', async () => 
   expect(dependents).toBeInTheDocument()
 })
 
-test('shows required error when provided', () => {
+test('marks invalid field when errors are present', () => {
   render(<Wrapper errors={{ maritalStatus: { type: 'required' } }} />)
-  expect(screen.getByText(/fieldRequired/i)).toBeInTheDocument()
+  const maritalStatus = screen.getByLabelText(/maritalStatus/i)
+  expect(maritalStatus).toHaveAttribute('aria-invalid', 'true')
 })
 
 

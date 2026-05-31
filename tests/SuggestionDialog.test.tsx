@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
-import { AIHelpModal } from '../src/features/aidForms/components/AIHelpModal'
+import { SuggestionDialog } from '../src/features/aidForms/components/SuggestionDialog'
 
 test('renders suggestion and calls handlers', async () => {
   const onClose = vi.fn()
   const onAccept = vi.fn()
   render(
-    <AIHelpModal
+    <SuggestionDialog
       visible={true}
       title="AI Suggestion"
       value="This is an AI suggestion"
